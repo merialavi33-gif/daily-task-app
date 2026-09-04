@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Login - Device & Task Controller</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Firebase -->
+    <script type="module">
+
+        import { initializeApp } 
+            from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword
+        } 
+        from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+        // ==============================
+        // FIREBASE CONFIG
+        // ==============================
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYinVdxtvYwTjD_KKpPTpYUBlVoyknJPw",
+            authDomain: "dailytaskapp-20859.firebaseapp.com",
+            projectId: "dailytaskapp-20859",
+            storageBucket: "dailytaskapp-20859.firebasestorage.app",
+            messagingSenderId: "132633352057",
+            appId: "1:132633352057:web:81bd7b2c88efbc16e881a8"
+        };
+
+
+        // ==============================
+        // INITIALIZE FIREBASE
+        // ==============================
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+
+        // ==============================
+        // USERNAME → FIREBASE EMAIL
+        // ==============================
+
+        function formatEmail(username) {
+
+            return username
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, "") + "@taskcontroller.local";
+
+        }
+
+
+        // ==============================
+        // LOGIN
+        // ==============================
+
+        window.handleLogin = async function(event) {
+
+            event.preventDefault();
+
+            const username =
+                document.getElementById("login-username").value.trim();
+
+            const password =
+                document.getElementById("login-password").value;
+
+
+            if (!username || !password) {
+
+                showAlert(
+                    "Missing Information",
+                    "Please enter your username and password."
+                );
+
+                return;
+            }
+
+
+            const fakeEmail = formatEmail(username);
+
+
+            try {
+
+                await signInWithEmailAndPassword(
+                    auth,
+                    fakeEmail,
+                    password
+                );
+
+
+                // Save username locally
+                localStorage.setItem(
+                    "username",
+                    username
+                );
+
+
+                // Save Firebase User ID
+                localStorage.setItem(
+                    "userId",
+                    auth.currentUser.uid
+                );
+
+
+                // Go to Dashboard
+                window.location.href = "dashboard.html";
+
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                let message =
+                    "Invalid username or password. Please try again.";
+
+
+                if (error.code === "auth/user-not-found") {
+
+                    message =
+                        "This account does not exist.";
+
+                } else if (error.code === "auth/wrong-password") {
+
+                    message =
+                        "Incorrect password.";
+
+                } else if (error.code === "auth/invalid-credential") {
+
+                    message =
+                        "Incorrect username or password.";
+
+                } else if (error.code === "auth/too-many-requests") {
+
+                    message =
+                        "Too many attempts. Please try again later.";
+                }
+
+
+                showAlert(
+                    "Login Failed",
+                    message
+                );
+            }
+        };
+
+
+        // ==============================
+        // REGISTER
+        // ==============================
+
+        window.handleRegister = async function(event) {
+
+            event.preventDefault();
+
+
+            const username =
+                document.getElementById("reg-username").value.trim();
+
+            const password =
+                document.getElementById("reg-password").value;
+
+
+            if (!username || !password) {
+
+                showAlert(
+                    "Missing Information",
+                    "Please enter a username and password."
+                );
+
+                return;
+            }
+
+
+            // Username validation
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+
+                showAlert(
+                    "Invalid Username",
+                    "Use only letters, numbers and underscore (_) in your username."
+                );
+
+                return;
+            }
+
+
+            // Firebase password minimum
+            if (password.length < 6) {
+
+                showAlert(
+                    "Password Too Short",
+                    "Password must contain at least 6 characters."
+                );
+
+                return;
+            }
+
+
+            const fakeEmail = formatEmail(username);
+
+
+            try {
+
+                const userCredential =
+                    await createUserWithEmailAndPassword(
+                        auth,
+                        fakeEmail,
+                        password
+                    );
+
+
+                const user =
+                    userCredential.user;
+
+
+                // Save user information locally
+                localStorage.setItem(
+                    "username",
+                    username
+                );
+
+                localStorage.setItem(
+                    "userId",
+                    user.uid
+                );
+
+
+                // Go to Dashboard
+                window.location.href =
+                    "dashboard.html";
+
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                let message =
+                    "Registration failed. Please try again.";
+
+
+                if (error.code === "auth/email-already-in-use") {
+
+                    message =
+                        "This username is already registered.";
+
+                } else if (error.code === "auth/invalid-email") {
+
+                    message =
+                        "Invalid username.";
+
+                } else if (error.code === "auth/weak-password") {
+
+                    message =
+                        "Password is too weak. Use at least 6 characters.";
+
+                }
+
+
+                showAlert(
+                    "Registration Error",
+                    message
+                );
+            }
+        };
+
+    </script>
+
+
+    <!-- ==============================
+         PAGE STYLE
+    =============================== -->
+
+    <style>
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family:
+                'Segoe UI',
+                system-ui,
+                -apple-system,
+                sans-serif;
+        }
+
+        .custom-gradient-bg {
+            background:
+                linear-gradient(
+                    180deg,
+                    #0b2545 0%,
+                    #134074 30%,
+                    #8da9c4 70%,
+                    #f4f6f9 100%
+                );
+        }
+
+    </style>
+
+</head>
+
+
+<body
+    class="custom-gradient-bg text-slate-900 min-h-screen flex flex-col justify-between p-4 relative"
+>
+
+
+    <!-- ==============================
+         MAIN AUTH CARD
+    =============================== -->
+
+    <main
+        class="w-full max-w-lg mx-auto
+               bg-slate-950/60
+               text-slate-100
+               rounded-[35px]
+               shadow-2xl
+               border border-white/15
+               p-8
+               mt-20
+               mb-auto
+               backdrop-blur-xl"
+    >
+
+
+        <!-- HEADER -->
+
+        <div
+            class="text-center mb-6 pb-6 border-b border-white/15"
+        >
+
+            <h1
+                id="form-heading"
+                class="text-xl font-extrabold
+                       tracking-tight
+                       transition-all duration-300
+                       text-slate-100"
+            >
+                Welcome to task control
+            </h1>
+
+
+            <p
+                id="form-subheading"
+                class="text-xs
+                       text-slate-300
+                       font-medium
+                       mt-1"
+            >
+                Enter your username to access your account.
+            </p>
+
+        </div>
+
+
+
+        <!-- ==============================
+             LOGIN FORM
+        =============================== -->
+
+        <form
+            id="form-login"
+            onsubmit="handleLogin(event)"
+            class="space-y-4"
+        >
+
+
+            <!-- USERNAME -->
+
+            <div>
+
+                <label
+                    class="block
+                           text-base
+                           font-bold
+                           text-slate-100
+                           mb-2"
+                >
+                    Username
+                </label>
+
+
+                <input
+                    type="text"
+                    id="login-username"
+                    required
+                    autocomplete="username"
+                    placeholder="Enter your username"
+
+                    class="w-full
+                           bg-slate-900/60
+                           border border-white/10
+                           rounded-2xl
+                           px-4 py-3.5
+                           text-base
+                           text-slate-100
+                           placeholder-slate-400
+                           focus:outline-none
+                           focus:border-emerald-400
+                           transition-all duration-200
+                           backdrop-blur-sm"
+                >
+
+            </div>
+
+
+
+            <!-- PASSWORD -->
+
+            <div>
+
+                <div
+                    class="flex
+                           items-center
+                           justify-between
+                           mb-2"
+                >
+
+                    <label
+                        class="block
+                               text-base
+                               font-bold
+                               text-slate-100"
+                    >
+                        Password
+                    </label>
+
+
+                    <a
+                        href="#"
+                        onclick="
+                            showAlert(
+                                'Password Reset',
+                                'Password reset will be added in the next step.'
+                            );
+                            return false;
+                        "
+
+                        class="text-xs
+                               font-semibold
+                               text-emerald-400
+                               hover:underline
+                               transition"
+                    >
+                        Forgot password?
+                    </a>
+
+                </div>
+
+
+
+                <div class="relative">
+
+                    <input
+                        type="password"
+                        id="login-password"
+                        required
+                        autocomplete="current-password"
+                        placeholder="••••••••"
+
+                        class="w-full
+                               bg-slate-900/60
+                               border border-white/10
+                               rounded-2xl
+                               px-4 py-3.5
+                               pr-12
+                               text-base
+                               text-slate-100
+                               placeholder-slate-400
+                               focus:outline-none
+                               focus:border-emerald-400
+                               transition-all duration-200
+                               backdrop-blur-sm"
+                    >
+
+
+                    <button
+                        type="button"
+                        onclick="togglePassword('login-password', this)"
+
+                        class="absolute
+                               inset-y-0
+                               right-0
+                               pr-4
+                               flex
+                               items-center
+                               text-slate-300
+                               hover:text-white
+                               transition
+                               active:scale-90"
+                    >
+
+                        <i
+                            class="fa-solid fa-eye-slash text-sm"
+                        ></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- LOGIN BUTTON -->
+
+            <button
+                type="submit"
+
+                class="w-full
+                       hover:opacity-90
+                       active:scale-[0.98]
+                       text-white
+                       font-bold
+                       text-base
+                       py-4
+                       rounded-full
+                       transition-all duration-200
+                       shadow-lg
+                       mt-4"
+
+                style="background-color: #00BF8C;"
+            >
+                Sign in
+            </button>
+
+
+
+            <!-- REGISTER LINK -->
+
+            <div class="text-center pt-3">
+
+                <p
+                    class="text-base
+                           text-slate-300
+                           font-medium"
+                >
+
+                    Don't have an account?
+
+                    <button
+                        type="button"
+                        onclick="switchTab('register')"
+
+                        class="text-emerald-400
+                               font-bold
+                               hover:underline
+                               transition"
+                    >
+                        Create account
+                    </button>
+
+                </p>
+
+            </div>
+
+        </form>
+
+
+
+        <!-- ==============================
+             REGISTER FORM
+        =============================== -->
+
+        <form
+            id="form-register"
+            onsubmit="handleRegister(event)"
+            class="space-y-4 hidden"
+        >
+
+
+            <!-- USERNAME -->
+
+            <div>
+
+                <label
+                    class="block
+                           text-base
+                           font-bold
+                           text-slate-100
+                           mb-2"
+                >
+                    Username
+                </label>
+
+
+                <input
+                    type="text"
+                    id="reg-username"
+                    required
+                    autocomplete="username"
+                    pattern="[a-zA-Z0-9_]+"
+                    placeholder="Choose a username"
+
+                    class="w-full
+                           bg-slate-900/60
+                           border border-white/10
+                           rounded-2xl
+                           px-4 py-3.5
+                           text-base
+                           text-slate-100
+                           placeholder-slate-400
+                           focus:outline-none
+                           focus:border-emerald-400
+                           transition-all duration-200
+                           backdrop-blur-sm"
+                >
+
+            </div>
+
+
+
+            <!-- PASSWORD -->
+
+            <div>
+
+                <label
+                    class="block
+                           text-base
+                           font-bold
+                           text-slate-100
+                           mb-2"
+                >
+                    Create Password
+                </label>
+
+
+                <div class="relative">
+
+                    <input
+                        type="password"
+                        id="reg-password"
+                        required
+                        minlength="6"
+                        autocomplete="new-password"
+                        placeholder="••••••••"
+
+                        class="w-full
+                               bg-slate-900/60
+                               border border-white/10
+                               rounded-2xl
+                               px-4 py-3.5
+                               pr-12
+                               text-base
+                               text-slate-100
+                               placeholder-slate-400
+                               focus:outline-none
+                               focus:border-emerald-400
+                               transition-all duration-200
+                               backdrop-blur-sm"
+                    >
+
+
+                    <button
+                        type="button"
+                        onclick="togglePassword('reg-password', this)"
+
+                        class="absolute
+                               inset-y-0
+                               right-0
+                               pr-4
+                               flex
+                               items-center
+                               text-slate-300
+                               hover:text-white
+                               transition
+                               active:scale-90"
+                    >
+
+                        <i
+                            class="fa-solid fa-eye-slash text-sm"
+                        ></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- REGISTER BUTTON -->
+
+            <button
+                type="submit"
+
+                class="w-full
+                       hover:opacity-90
+                       active:scale-[0.98]
+                       text-white
+                       font-bold
+                       text-base
+                       py-4
+                       rounded-full
+                       transition-all duration-200
+                       shadow-lg
+                       mt-4"
+
+                style="background-color: #00BF8C;"
+            >
+                Register & Enter App
+            </button>
+
+
+
+            <!-- LOGIN LINK -->
+
+            <div class="text-center pt-3">
+
+                <p
+                    class="text-base
+                           text-slate-300
+                           font-medium"
+                >
+
+                    Already have an account?
+
+                    <button
+                        type="button"
+                        onclick="switchTab('login')"
+
+                        class="text-emerald-400
+                               font-bold
+                               hover:underline
+                               transition"
+                    >
+                        Sign in
+                    </button>
+
+                </p>
+
+            </div>
+
+        </form>
+
+    </main>
+
+
+
+    <!-- ==============================
+         FOOTER
+    =============================== -->
+
+    <footer
+        class="w-full
+               max-w-lg
+               mx-auto
+               text-center
+               py-3"
+    >
+
+        <p
+            class="text-xs
+                   font-black
+                   tracking-wider"
+
+            style="color: #000000;"
+        >
+            Device & Task Controller Suite © 2026
+        </p>
+
+    </footer>
+
+
+
+    <!-- ==============================
+         ALERT MODAL
+    =============================== -->
+
+    <div
+        id="auth-modal"
+
+        class="fixed
+               inset-0
+               bg-slate-950/80
+               backdrop-blur-md
+               flex
+               items-center
+               justify-center
+               p-4
+               hidden
+               z-50
+               transition-opacity"
+    >
+
+        <div
+            class="w-full
+                   max-w-sm
+                   bg-slate-950/95
+                   border border-white/15
+                   rounded-[35px]
+                   p-8
+                   text-center
+                   shadow-2xl
+                   text-slate-100"
+        >
+
+            <div
+                class="w-12
+                       h-12
+                       rounded-2xl
+                       bg-emerald-500/10
+                       border border-emerald-500/30
+                       flex
+                       items-center
+                       justify-center
+                       mx-auto
+                       mb-4
+                       text-emerald-400
+                       shadow-lg"
+            >
+
+                <i
+                    class="fa-solid
+                           fa-triangle-exclamation
+                           text-base"
+                ></i>
+
+            </div>
+
+
+            <h3
+                id="auth-modal-title"
+                class="text-base
+                       font-extrabold
+                       mb-2"
+            >
+                Notice
+            </h3>
+
+
+            <p
+                id="auth-modal-msg"
+                class="text-base
+                       font-medium
+                       mb-6
+                       text-slate-300"
+            >
+                Message goes here
+            </p>
+
+
+            <button
+                onclick="closeAuthModal()"
+
+                class="w-full
+                       text-white
+                       hover:opacity-90
+                       active:scale-[0.98]
+                       font-bold
+                       text-base
+                       py-4
+                       rounded-full
+                       transition-all duration-200
+                       shadow-lg"
+
+                style="background-color: #00BF8C;"
+            >
+                OK
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==============================
+         PAGE JAVASCRIPT
+    =============================== -->
+
+    <script>
+
+        // ==============================
+        // SWITCH LOGIN / REGISTER
+        // ==============================
+
+        function switchTab(tab) {
+
+            const loginForm =
+                document.getElementById("form-login");
+
+            const registerForm =
+                document.getElementById("form-register");
+
+            const heading =
+                document.getElementById("form-heading");
+
+            const subheading =
+                document.getElementById("form-subheading");
+
+
+            if (tab === "login") {
+
+                loginForm.classList.remove("hidden");
+
+                registerForm.classList.add("hidden");
+
+                heading.innerText =
+                    "Welcome to task control";
+
+                subheading.innerText =
+                    "Enter your username to access your account.";
+
+            }
+
+
+            if (tab === "register") {
+
+                loginForm.classList.add("hidden");
+
+                registerForm.classList.remove("hidden");
+
+                heading.innerText =
+                    "Create Account";
+
+                subheading.innerText =
+                    "Set up your username and password";
+            }
+
+        }
+
+
+
+        // ==============================
+        // SHOW / HIDE PASSWORD
+        // ==============================
+
+        function togglePassword(fieldId, btn) {
+
+            const input =
+                document.getElementById(fieldId);
+
+            const icon =
+                btn.querySelector("i");
+
+
+            if (input.type === "password") {
+
+                input.type = "text";
+
+                icon.className =
+                    "fa-solid fa-eye text-sm";
+
+            } else {
+
+                input.type = "password";
+
+                icon.className =
+                    "fa-solid fa-eye-slash text-sm";
+            }
+
+        }
+
+
+
+        // ==============================
+        // ALERT
+        // ==============================
+
+        function showAlert(title, message) {
+
+            document.getElementById(
+                "auth-modal-title"
+            ).innerText = title;
+
+
+            document.getElementById(
+                "auth-modal-msg"
+            ).innerText = message;
+
+
+            document.getElementById(
+                "auth-modal"
+            ).classList.remove("hidden");
+        }
+
+
+
+        // ==============================
+        // CLOSE ALERT
+        // ==============================
+
+        function closeAuthModal() {
+
+            document.getElementById(
+                "auth-modal"
+            ).classList.add("hidden");
+        }
+
+    </script>
+
+</body>
+</html>
