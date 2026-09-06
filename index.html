@@ -69,6 +69,8 @@
                 localStorage.setItem("username", username);
                 // Save Firebase User ID
                 localStorage.setItem("userId", auth.currentUser.uid);
+                // Save Login State for Auto-Redirect
+                localStorage.setItem("isLoggedIn", "true");
 
                 // Go to Dashboard
                 window.location.href = "dashboard.html";
@@ -136,6 +138,8 @@
                 // Save user information locally
                 localStorage.setItem("username", username);
                 localStorage.setItem("userId", user.uid);
+                // Save Login State for Auto-Redirect
+                localStorage.setItem("isLoggedIn", "true");
 
                 // Go to Dashboard
                 window.location.href = "dashboard.html";
@@ -363,6 +367,13 @@
 
     <!-- ============================== PAGE JAVASCRIPT =============================== -->
     <script>
+        // አፑ ሲከፈት ተጠቃሚው አስቀድሞ ሎጊን አድርጎ ከሆነ በቀጥታ ወደ ዳሽቦርድ ይወስደዋል
+        window.onload = function() {
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                window.location.href = 'dashboard.html';
+            }
+        };
+
         function switchTab(tab) {
             const loginForm = document.getElementById("form-login");
             const registerForm = document.getElementById("form-register");
@@ -393,7 +404,6 @@
             const pass = document.getElementById("login-password").value;
             const btn = document.getElementById("login-btn");
 
-            // Require at least 3 characters for username and 6 characters for password
             if (user.length >= 3 && pass.length >= 6) {
                 btn.classList.remove("btn-inactive");
                 btn.classList.add("btn-active");
@@ -408,7 +418,6 @@
             const pass = document.getElementById("reg-password").value;
             const btn = document.getElementById("reg-btn");
 
-            // Require at least 3 characters for username and 6 characters for password
             if (user.length >= 3 && pass.length >= 6) {
                 btn.classList.remove("btn-inactive");
                 btn.classList.add("btn-active");
