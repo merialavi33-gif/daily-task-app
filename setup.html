@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stream Accounts & Targets - Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Firebase SDKs (Compat - For Realtime Database & Auth) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0f172a !important;
+            color: #f8fafc !important;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 3px; }
+
+        .unified-glass-panel {
+            background: rgba(15, 23, 42, 0.85) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+        }
+
+        .glass-header { 
+            background: rgba(15, 23, 42, 0.9); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            background-color: rgba(30, 41, 59, 0.7) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #f8fafc !important;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+            outline: none;
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            background-size: 16px !important;
+        }
+
+        select option {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12 flex flex-col items-center justify-start p-4">
+
+    <!-- Top Navigation / Header -->
+    <header class="glass-header border-b border-slate-800 w-full max-w-md fixed top-0 z-50 px-4 py-3">
+        <div class="flex justify-between items-center">
+            <h1 class="text-sm font-extrabold text-slate-100 tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-gear text-amber-400"></i> Setup & Configuration
+            </h1>
+            <!-- እዚህ ጋር ወደ dashboard.html እንዲመለስ ተደርጓል -->
+            <a href="dashboard.html" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-md mt-16 space-y-6">
+
+        <!-- Add Device Card -->
+        <div class="unified-glass-panel rounded-3xl p-5 shadow-xl">
+            <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-mobile-screen"></i> Add New Device
+            </h2>
+            <form id="deviceForm" class="space-y-4">
+                <div>
+                    <label for="phone-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Phone Name</label>
+                    <input type="text" id="phone-name" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Phone Ultra" required>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus text-xs"></i> Save Device
+                </button>
+            </form>
+        </div>
+
+        <!-- Add App and Account Card -->
+        <div class="unified-glass-panel rounded-3xl p-5 shadow-xl">
+            <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-layer-group"></i> Add App & Account
+            </h2>
+            <form id="appForm" class="space-y-4">
+                <div>
+                    <label for="select-device" class="block text-xs font-semibold text-slate-300 mb-1.5">Select Device</label>
+                    <select id="select-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                        <option value="" disabled selected>Select a device</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="select-app-type" class="block text-xs font-semibold text-slate-300 mb-1.5">App Type</label>
+                    <input type="text" id="select-app-type" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Poppo or desdes" required>
+                </div>
+
+                <div>
+                    <label for="acc-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Account Name</label>
+                    <input type="text" id="acc-name" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Poppo (AGB)" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="daily-reward" class="block text-xs font-semibold text-slate-300 mb-1.5">Daily Reward</label>
+                        <input type="number" id="daily-reward" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. 2800" required>
+                    </div>
+                    <div>
+                        <label for="total-target" class="block text-xs font-semibold text-slate-300 mb-1.5">Total Target</label>
+                        <select id="total-target" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                            <option value="" disabled selected>Select target</option>
+                            <option value="100k">100k</option>
+                            <option value="1m">1m</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-600 hover:to-emerald-600 text-slate-950 font-extrabold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
+                    <i class="fa-solid fa-floppy-disk text-xs"></i> Save Account
+                </button>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Script Logic -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYinVdxtvYwTjD_KKpPTpYUBlVoyknJPw",
+            authDomain: "dailytaskapp-20859.firebaseapp.com",
+            projectId: "dailytaskapp-20859",
+            storageBucket: "dailytaskapp-20859.firebasestorage.app",
+            messagingSenderId: "132633352057",
+            appId: "1:132633352057:web:81bd7b2c88efbc16e881a8",
+            databaseURL: "https://dailytaskapp-20859-default-rtdb.firebaseio.com"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let devicesRef = null;
+        let cachedDevices = [];
+
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = "index.html";
+            } else {
+                devicesRef = db.ref('users/' + user.uid + '/devices');
+
+                devicesRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    const selectDevice = document.getElementById('select-device');
+                    
+                    selectDevice.innerHTML = '<option value="" disabled selected>Select a device</option>';
+                    
+                    if (data) {
+                        cachedDevices = Object.values(data);
+                        cachedDevices.forEach(dev => {
+                            const option = document.createElement('option');
+                            option.value = dev.id;
+                            option.textContent = dev.name;
+                            selectDevice.appendChild(option);
+                        });
+                    } else {
+                        cachedDevices = [];
+                    }
+                });
+            }
+        });
+
+        // አዲስ መሳሪያ (Device) ማስቀመጥ
+        document.getElementById('deviceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!devicesRef) return;
+
+            const phoneInput = document.getElementById('phone-name');
+            const phoneName = phoneInput.value.trim();
+
+            if (phoneName) {
+                const deviceId = 'dev_' + Date.now();
+                const colors = [
+                    'from-blue-500 to-cyan-500', 
+                    'from-purple-500 to-indigo-500', 
+                    'from-emerald-500 to-teal-500', 
+                    'from-amber-500 to-orange-500', 
+                    'from-rose-500 to-pink-500'
+                ];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+                const newDeviceData = {
+                    id: deviceId,
+                    name: phoneName,
+                    color: randomColor,
+                    apps: []
+                };
+
+                devicesRef.child(deviceId).set(newDeviceData)
+                    .then(() => {
+                        phoneInput.value = '';
+                        window.location.href = "dashboard.html";
+                    })
+                    .catch((error) => {
+                        alert('Error saving device: ' + error.message);
+                    });
+            }
+        });
+
+        // አዲስ አፕ እና አካውንት ከመረጃዎቹ ጋር ማስቀመጥ
+        document.getElementById('appForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!devicesRef) return;
+
+            const deviceId = document.getElementById('select-device').value;
+            const appTypeInput = document.getElementById('select-app-type');
+            const appType = appTypeInput.value.trim();
+            const accNameInput = document.getElementById('acc-name');
+            const accName = accNameInput.value.trim();
+            const dailyReward = document.getElementById('daily-reward').value.trim();
+            const totalTarget = document.getElementById('total-target').value;
+
+            if (!deviceId) {
+                alert('Please select a device first!');
+                return;
+            }
+
+            if (!appType) {
+                alert('Please enter an app type!');
+                return;
+            }
+
+            if (!accName) {
+                alert('Please enter an account name!');
+                return;
+            }
+
+            if (!totalTarget) {
+                alert('Please select a total target!');
+                return;
+            }
+
+            const targetDevice = cachedDevices.find(d => d.id === deviceId);
+            if (!targetDevice) {
+                alert('Selected device not found!');
+                return;
+            }
+
+            const itemId = 'acc_' + Date.now();
+            
+            const accountData = {
+                id: itemId,
+                appType: appType,
+                name: accName,
+                dailyReward: dailyReward,
+                totalTarget: totalTarget
+            };
+
+            const normalizedKey = appType.toLowerCase().replace(/\s+/g, '_');
+            if (!targetDevice[normalizedKey]) targetDevice[normalizedKey] = [];
+            targetDevice[normalizedKey].push(accountData);
+
+            devicesRef.child(deviceId).set(targetDevice)
+                .then(() => {
+                    appTypeInput.value = '';
+                    accNameInput.value = '';
+                    document.getElementById('daily-reward').value = '';
+                    document.getElementById('total-target').selectedIndex = 0;
+                    window.location.href = "dashboard.html";
+                })
+                .catch((error) => {
+                    alert('Error adding account: ' + error.message);
+                });
+        });
+    </script>
+</body>
+</html>
