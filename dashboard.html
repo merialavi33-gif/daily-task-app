@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="am">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -17,9 +17,9 @@
     <style>
         * { -webkit-tap-highlight-color: transparent; }
         body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(180deg, #090d16 0%, #111c33 35%, #0f172a 100%) !important;
-            background-attachment: fixed !important;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0f172a !important;
+            color: #f8fafc !important;
             min-height: 100vh;
         }
 
@@ -33,6 +33,7 @@
         }
         .device-card {
             animation: fadeIn 0.3s ease-out forwards;
+            opacity: 0;
             background: rgba(15, 23, 42, 0.75) !important;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -47,7 +48,7 @@
         }
 
         .unified-glass-panel {
-            background: rgba(15, 23, 42, 0.85) !important;
+            background: rgba(15, 23, 42, 0.95) !important;
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -66,7 +67,7 @@
         .device-progress-bg { background: linear-gradient(90deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%); }
         .device-progress-fill { background: linear-gradient(90deg, #f59e0b 0%, #10b981 100%); transition: width 0.5s ease; }
 
-        .glass-header { background: rgba(11, 18, 33, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .glass-header { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .stat-card { 
             background: rgba(15, 23, 42, 0.75) !important; 
             backdrop-filter: blur(12px);
@@ -124,9 +125,21 @@
             gap: 3px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        .btn-day-edit { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); color: #ffffff; border: 1px solid #fbbf24; }
-        .btn-day-save { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #ffffff; border: 1px solid #34d399; }
-        .btn-day-reset { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: #ffffff; border: 1px solid #f87171; }
+        .btn-day-edit {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+            color: #ffffff;
+            border: 1px solid #fbbf24;
+        }
+        .btn-day-save {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: #ffffff;
+            border: 1px solid #34d399;
+        }
+        .btn-day-reset {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: #ffffff;
+            border: 1px solid #f87171;
+        }
         
         .point-input {
             background: #0f172a;
@@ -139,19 +152,18 @@
             text-align: center;
         }
 
-        .custom-modal-bg { background: transparent; pointer-events: none; }
+        .custom-modal-bg { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); }
         .custom-modal-box {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(16, 185, 129, 0.95) 100%);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-            pointer-events: auto;
         }
+
         .filter-container-bg {
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(245, 158, 11, 0.12) 100%);
             border: 1px solid rgba(16, 185, 129, 0.25);
         }
+
         .filter-tab {
             background: rgba(15, 23, 42, 0.6);
             color: #94a3b8;
@@ -167,7 +179,9 @@
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff;
             border-color: #34d399;
+            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
         }
+
         .phone-filter-btn {
             background: rgba(15, 23, 42, 0.75);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -182,94 +196,62 @@
             align-items: center;
             justify-content: center;
             gap: 4px;
+            backdrop-filter: blur(8px);
         }
         .phone-filter-btn.active {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: #0f172a;
             border-color: #fbbf24;
+            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.35);
             font-weight: 700;
-        }
-        
-        /* Dropdown Menu Styles */
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            margin-top: 8px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            min-width: 140px;
-            overflow: hidden;
-            animation: fadeIn 0.2s ease-out forwards;
-        }
-        .dropdown-menu.show {
-            display: block;
-        }
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #cbd5e1;
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-        .dropdown-item:hover {
-            background: rgba(51, 65, 85, 0.6);
-            color: #f8fafc;
         }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen pb-20">
+<body class="min-h-screen pb-20">
 
     <!-- Custom Popup Modal Container -->
     <div id="custom-modal" class="fixed inset-0 z-[100] custom-modal-bg flex items-center justify-center p-4 hidden">
-        <div class="custom-modal-box w-full max-w-sm rounded-3xl overflow-hidden animate-[fadeIn_0.2s_ease-out] text-slate-950 p-6 text-center">
-            <div class="w-14 h-14 rounded-2xl bg-slate-950/15 border border-white/20 flex items-center justify-center mx-auto mb-3 shadow-inner">
-                <i id="custom-modal-icon" class="fa-solid fa-triangle-exclamation text-slate-950 text-2xl"></i>
+        <div class="custom-modal-box w-full max-w-sm rounded-3xl overflow-hidden p-6 text-center">
+            <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-3">
+                <i id="custom-modal-icon" class="fa-solid fa-triangle-exclamation text-amber-400 text-2xl"></i>
             </div>
-            <h3 id="custom-modal-title" class="text-lg font-extrabold text-slate-950 mb-2 tracking-wide">Confirmation</h3>
-            <p id="custom-modal-message" class="text-xs font-semibold text-slate-900 mb-6 leading-relaxed px-2">Do you want to proceed?</p>
+            <h3 id="custom-modal-title" class="text-lg font-extrabold text-slate-100 mb-2 tracking-wide">ማረጋገጫ</h3>
+            <p id="custom-modal-message" class="text-xs font-semibold text-slate-300 mb-6 leading-relaxed px-2">እርግጠኛ ኖት?</p>
             <div id="custom-modal-actions" class="flex gap-3 justify-center">
-                <button id="custom-modal-cancel" class="flex-1 bg-slate-900/30 hover:bg-slate-900/50 text-slate-950 font-bold text-xs py-3 px-4 rounded-xl border border-white/20 transition">Cancel</button>
-                <button id="custom-modal-confirm" class="flex-1 bg-slate-950 hover:bg-slate-900 text-amber-400 font-extrabold text-xs py-3 px-4 rounded-xl transition shadow-xl">OK</button>
+                <button id="custom-modal-cancel" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-3 px-4 rounded-xl border border-slate-700 transition active:scale-95">ይቅር</button>
+                <button id="custom-modal-confirm" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs py-3 px-4 rounded-xl transition shadow-lg active:scale-95">አዎ</button>
             </div>
         </div>
     </div>
 
-    <!-- Header -->
-    <header class="glass-header border-b border-slate-800/60 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div>
-                    <h1 class="text-base md:text-lg font-bold text-slate-100 tracking-wide">Device & Task Controller</h1>
-                    <p id="connection-status" class="text-[11px] text-emerald-400 font-medium mt-0.5 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Connected
-                    </p>
-                </div>
+    <!-- Top Navigation / Header -->
+    <header class="glass-header border-b border-slate-800 sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-base font-extrabold text-slate-100 tracking-wide">Task & Account Controller</h1>
+                <p id="connection-status" class="text-[11px] text-emerald-400 font-medium mt-0.5 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span> Connected
+                </p>
             </div>
             <div class="flex items-center gap-2">
                 <button id="notify-btn" class="w-9 h-9 bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl flex items-center justify-center transition border border-slate-700/60 shadow-sm" title="Sound Test">
                     <i class="fa-solid fa-volume-high text-sm"></i>
                 </button>
-                
-                <!-- Menu Button with Dropdown -->
                 <div class="relative">
-                    <button id="menu-toggle-btn" class="w-9 h-9 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/60 rounded-xl text-xs font-bold flex items-center justify-center transition active:scale-95 shadow-sm" title="Menu">
+                    <button id="menu-toggle-btn" class="w-9 h-9 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/60 rounded-xl text-xs font-bold flex items-center justify-center transition shadow-sm">
                         <i class="fa-solid fa-bars text-sm"></i>
                     </button>
-                    <div id="dropdown-menu" class="dropdown-menu">
-                        <a href="profile.html" class="dropdown-item">
-                            <i class="fa-solid fa-user text-amber-400"></i> profile
+                    <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-56 unified-glass-panel rounded-2xl shadow-2xl py-1 z-50 overflow-hidden">
+                        <button id="menu-accounts-btn" class="w-full text-left px-4 py-3 text-xs font-semibold text-slate-200 hover:bg-slate-800/80 flex items-center justify-between transition">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-users-viewfinder text-amber-400"></i> Accounts Tracker</span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+                        </button>
+                        <a href="setup.html" class="w-full text-left px-4 py-3 text-xs font-semibold text-slate-200 hover:bg-slate-800/80 flex items-center justify-between transition border-t border-slate-800">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-gear text-amber-400"></i> Setup</span>
                         </a>
+                        <button id="menu-logout-btn" class="w-full text-left px-4 py-3 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 flex items-center justify-between transition border-t border-slate-800">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-right-from-bracket"></i> Sign out</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -278,7 +260,7 @@
 
     <!-- Accounts Modal / Drawer -->
     <div id="accounts-modal" class="fixed inset-0 z-[90] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="unified-glass-panel w-full max-w-lg rounded-3xl p-5 shadow-2xl max-h-[90vh] flex flex-col">
+        <div class="unified-glass-panel w-full max-w-lg rounded-3xl p-5 shadow-2xl animate-[fadeIn_0.2s_ease-out] max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 flex-shrink-0">
                 <div class="flex items-center gap-2.5 min-w-0 pr-2">
                     <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
@@ -295,17 +277,15 @@
             </div>
 
             <div class="filter-container-bg p-2 rounded-2xl mb-3 flex-shrink-0">
-                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar" id="tracker-filters-container">
                     <button class="filter-tab active" data-filter="all">All</button>
                     <button class="filter-tab" data-filter="poppo">Poppo</button>
                     <button class="filter-tab" data-filter="desdes">desdes</button>
-                    <button class="filter-tab" data-filter="tello">tello</button>
-                    <button class="filter-tab" data-filter="kaya">Kaya</button>
-                    <button class="filter-tab" data-filter="yago">Yago</button>
                 </div>
             </div>
 
-            <div id="accounts-list-container" class="space-y-3 overflow-y-auto pr-1 flex-1"></div>
+            <div id="accounts-list-container" class="space-y-3 overflow-y-auto pr-1 flex-1">
+            </div>
             
             <div class="pt-3 border-t border-slate-800 mt-3 text-center flex-shrink-0">
                 <p class="text-[10px] text-slate-500">🚀 Keep going! Accounts are sorted by remaining days.</p>
@@ -313,36 +293,39 @@
         </div>
     </div>
 
-    <main class="max-w-6xl mx-auto px-4 mt-4">
+    <!-- Main Container -->
+    <main class="max-w-2xl mx-auto p-4 space-y-4">
 
         <!-- Congrats Banner -->
-        <div id="congrats-banner" class="hidden bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/50 text-emerald-300 p-4 rounded-2xl mb-4 text-center shadow-lg">
+        <div id="congrats-banner" class="hidden bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/50 text-emerald-300 p-4 rounded-2xl text-center shadow-lg shadow-emerald-500/10">
             <h2 class="text-base font-bold flex items-center justify-center gap-2">
-                <span class="text-xl">🎉</span> Congratulations! All tasks for today are fully completed!
+                <span class="text-xl">🎉</span> እንኳን ደስ አሎት! የዛሬው ስራዎች ሙሉ በሙሉ ተጠናቀዋል!
             </h2>
         </div>
 
-        <!-- Date & Countdown Row -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-            <div class="stat-card p-4">
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-1">Ethiopian Date</p>
-                <p id="ethiopian-date-display" class="text-sm font-bold text-slate-100 flex items-center gap-2">
-                    <i class="fa-regular fa-calendar-days text-amber-400"></i> Loading...
-                </p>
+        <!-- Ethiopian Date Display -->
+        <div class="stat-card p-4 space-y-1">
+            <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Ethiopian Date</p>
+            <p id="ethiopian-date-display" class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                <i class="fa-regular fa-calendar-days text-amber-400"></i> Loading...
+            </p>
+        </div>
+
+        <!-- Countdown / Reset Info Card -->
+        <div class="stat-card p-4 flex justify-between items-center shadow-lg">
+            <div>
+                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Reset Countdown</span>
+                <div id="countdown-timer" class="text-xl font-bold text-cyan-400 mt-0.5 font-mono">00:00:00</div>
             </div>
-            <div class="stat-card p-4 flex items-center justify-between">
-                <div>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-1">Reset Countdown</p>
-                    <span id="countdown-timer" class="text-lg font-mono font-extrabold text-cyan-400 tracking-wider">00:00:00</span>
-                </div>
-                <button id="reset-btn" class="text-[11px] bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl transition active:scale-95 flex items-center gap-1.5 font-semibold">
+            <div class="text-right">
+                <button id="reset-btn" class="text-[11px] bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3.5 py-2.5 rounded-xl transition-all active:scale-95 flex items-center gap-1.5 font-semibold shadow-sm">
                     <i class="fa-solid fa-rotate-left"></i>Reset Ticks
                 </button>
             </div>
         </div>
 
-        <!-- Top Stats Row -->
-        <div class="grid grid-cols-2 gap-3 mb-4">
+        <!-- Top Stats Row (2x2 Grid) -->
+        <div class="grid grid-cols-2 gap-3">
             <div class="stat-card p-4">
                 <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-1">Total Tasks</p>
                 <p id="stat-total" class="text-2xl font-extrabold text-slate-100">0</p>
@@ -362,14 +345,14 @@
         </div>
 
         <!-- Overall Progress -->
-        <section class="device-card rounded-2xl p-4 mb-4 shadow-xl">
+        <section class="device-card rounded-2xl p-4 shadow-xl">
             <div class="flex items-center justify-between mb-2">
                 <div>
                     <h2 class="text-sm font-bold text-slate-100">Overall Progress</h2>
                     <p class="text-[10px] text-slate-400">Daily task completion</p>
                 </div>
                 <div class="text-right">
-                    <span id="progress-text" class="text-lg font-extrabold text-slate-100">0%</span>
+                    <span id="progress-text" class="text-base font-extrabold text-slate-100">0%</span>
                 </div>
             </div>
             <div class="w-full bg-slate-800/80 h-3 rounded-full overflow-hidden p-0.5">
@@ -377,31 +360,78 @@
             </div>
         </section>
 
-        <!-- Phones Section Header -->
-        <div class="flex items-center justify-between mb-2">
-            <h3 class="text-[11px] font-bold text-slate-400 tracking-wider uppercase">phone</h3>
-        </div>
-
-        <!-- Quick Phone Filter Buttons Bar (Dynamically populated based on added devices) -->
-        <section class="mb-5">
-            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" id="phone-filters-container">
+        <!-- Quick Phone Filter Buttons Bar -->
+        <section>
+            <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-2">Phones</p>
+            <div class="grid grid-cols-4 gap-2 mb-2" id="phone-filters-row1">
                 <button class="phone-filter-btn active" data-phone="all">All</button>
+            </div>
+            <div class="grid grid-cols-3 gap-2" id="phone-filters-row2">
             </div>
         </section>
 
-        <!-- Devices Grid (Starts empty until user adds devices) -->
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="devices-container">
-            <!-- Dynamically populated or hidden empty state -->
-        </section>
-
-        <!-- Footer -->
-        <div class="mt-8 text-center pb-4">
-            <p class="text-[10px] text-slate-500">Multi-Device Task Controller v3.5</p>
+        <!-- Dynamic Devices Container -->
+        <div id="devices-container" class="space-y-4">
+            <div class="text-center py-10 text-slate-500">
+                <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+                <p class="text-sm">Loading devices and accounts...</p>
+            </div>
         </div>
+
     </main>
 
-    <!-- Sound & Custom Modal Handler -->
+    <!-- Script Logic -->
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYinVdxtvYwTjD_KKpPTpYUBlVoyknJPw",
+            authDomain: "dailytaskapp-20859.firebaseapp.com",
+            projectId: "dailytaskapp-20859",
+            storageBucket: "dailytaskapp-20859.firebasestorage.app",
+            messagingSenderId: "132633352057",
+            appId: "1:132633352057:web:81bd7b2c88efbc16e881a8",
+            databaseURL: "https://dailytaskapp-20859-default-rtdb.firebaseio.com"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let tasksRef = null;
+        let daysRef = null;
+        let devicesRef = null;
+
+        // ነባር እና አዲስ የሚመጡ አፖችን የሚያስተናግድ ደንብ (ለፖፖ እና ደስደስ የራሳቸው ስታንዳርድ አላቸው፤ ሌላ አዲስ ቢገባ በነባሪ እንደ ደስደስ ዓይነት ስታንዳርድ ይይዛል)
+        const appRules = {
+            poppo: { daily: 2800, target: 100000, targetFormatted: "100k", maxDays: 36, name: "Poppo", badgeColor: "bg-rose-500/20 text-rose-400 border-rose-500/30" },
+            desdes: { daily: 10000, target: 1000000, targetFormatted: "1m", maxDays: 100, name: "desdes", badgeColor: "bg-blue-500/20 text-blue-400 border-blue-500/30" }
+        };
+
+        // ማናቸውንም አዲስ አፕ ሲገባ አውቶማቲክ ስታንዳርድ የሚሰጥ ፈንክሽን
+        function getAppRule(appType) {
+            if (appRules[appType]) {
+                return appRules[appType];
+            }
+            // ማንኛውም አዲስ አፕ ቢመጣ የደስደስን ስታንዳርድ (ዕለታዊ 10,000፣ ዒላማ 1ሚሊዮን) በነባሪ ይይዛል
+            let capitalizedName = appType.charAt(0).toUpperCase() + appType.slice(1);
+            return {
+                daily: 10000,
+                target: 1000000,
+                targetFormatted: "1m",
+                maxDays: 100,
+                name: capitalizedName,
+                badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+            };
+        }
+
+        let devicesData = [];
+        let celebrated = false;
+        let daysCache = {};
+        let editingStates = {};
+        let currentFilter = 'all';
+        let currentPhoneFilter = 'all';
+
         window.requestNotificationPermission = function() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -417,7 +447,7 @@
                 osc.stop(ctx.currentTime + 0.4);
                 showCustomAlert('Sound Test', 'Audio alert tested successfully!');
             } catch (err) {
-                showCustomAlert('Error', 'Could not play audio.');
+                console.log('Audio notification error: ', err);
             }
         };
 
@@ -470,43 +500,6 @@
                 cancelBtn.style.display = 'block';
             });
         }
-    </script>
-
-    <!-- Firebase SDK & Dynamic UI Logic -->
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBYinVdxtvYwTjD_KKpPTpYUBlVoyknJPw",
-            authDomain: "dailytaskapp-20859.firebaseapp.com",
-            projectId: "dailytaskapp-20859",
-            storageBucket: "dailytaskapp-20859.firebasestorage.app",
-            messagingSenderId: "132633352057",
-            appId: "1:132633352057:web:81bd7b2c88efbc16e881a8",
-            databaseURL: "https://dailytaskapp-20859-default-rtdb.firebaseio.com"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const db = firebase.database();
-        const tasksRef = db.ref('appState/tasks');
-        const daysRef = db.ref('appState/days');
-        const devicesRef = db.ref('appState/devices'); // Dynamic devices storage
-
-        const appRules = {
-            poppo: { daily: 2800, target: 100000, targetFormatted: "100k", maxDays: 36, name: "Poppo", badgeColor: "bg-rose-500/20 text-rose-400 border-rose-500/30" },
-            desdes: { daily: 10000, target: 1000000, targetFormatted: "1m", maxDays: 100, name: "desdes", badgeColor: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
-            tello: { daily: 10000, target: 1000000, targetFormatted: "1m", maxDays: 100, name: "tello", badgeColor: "bg-teal-500/20 text-teal-400 border-teal-500/30" },
-            kaya:  { daily: 1000, target: 100000, targetFormatted: "100k", maxDays: 100, name: "Kaya", badgeColor: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
-            yago:  { daily: 1200, target: 100000, targetFormatted: "100k", maxDays: 84, name: "Yago", badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30" }
-        };
-
-        let devicesData = []; // Starts empty! Loaded from Firebase/LocalStorage
-        let celebrated = false;
-        let daysCache = {};
-        let editingStates = {};
-        let currentFilter = 'all';
-        let currentPhoneFilter = 'all';
 
         function formatPoints(points) {
             if (isNaN(points)) return "0";
@@ -517,46 +510,22 @@
             let earnedPoints = daysCache[accId] !== undefined ? parseFloat(daysCache[accId]) : parseFloat(localStorage.getItem(accId + '_earned_points') || '0');
             if (isNaN(earnedPoints)) earnedPoints = 0;
             
-            const rule = appRules[appType] || appRules['poppo'];
+            const rule = getAppRule(appType);
             let daysWorked = Math.floor(earnedPoints / rule.daily);
 
             const remainingPoints = Math.max(0, rule.target - earnedPoints);
             const remainingDays = Math.max(0, Math.ceil(remainingPoints / rule.daily));
 
             return { 
-                accId, appType, daysWorked, earnedPoints, 
+                accId,
+                appType,
+                daysWorked, 
+                earnedPoints, 
                 earnedFormatted: formatPoints(earnedPoints),
-                remainingDays, target: rule.target, targetFormatted: rule.targetFormatted 
+                remainingDays, 
+                target: rule.target,
+                targetFormatted: rule.targetFormatted 
             };
-        }
-
-        function refreshSingleTrackerUI(accId, appType) {
-            const statsContainer = document.getElementById(accId + '_stats');
-            if (statsContainer) {
-                const stats = getAccountStats(accId, appType);
-                const isEditing = editingStates[accId] || false;
-
-                let pointsDisplayHtml = isEditing ? 
-                    '<input type="number" id="' + accId + '_input" value="' + stats.earnedPoints + '" class="point-input" step="any" min="0">' :
-                    '<strong class="text-amber-400 font-extrabold">' + stats.earnedFormatted + '</strong>';
-
-                let actionButtonHtml = isEditing ? 
-                    '<button onclick="saveAccountPoints(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-save"><i class="fa-solid fa-floppy-disk text-[10px]"></i> Save</button>' :
-                    '<button onclick="toggleEditPoints(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-edit"><i class="fa-solid fa-pen-to-square text-[10px]"></i> Edit</button>';
-
-                statsContainer.innerHTML = 
-                    '<div class="flex justify-between items-center text-slate-200 font-semibold">' +
-                        '<span><i class="fa-regular fa-calendar-check text-amber-400 mr-1"></i>Days: <strong class="text-amber-400 font-bold">' + stats.daysWorked + ' d</strong></span>' +
-                        '<span><i class="fa-solid fa-coins text-yellow-400 blink-icon mr-1"></i>Points: ' + pointsDisplayHtml + ' / <span class="text-slate-300 font-bold">' + stats.targetFormatted + '</span></span>' +
-                    '</div>' +
-                    '<div class="flex justify-between items-center text-slate-300 mt-1 flex-wrap gap-1">' +
-                        '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-hourglass-start mr-1"></i>Days Left: ' + stats.remainingDays + '</span>' +
-                        '<div class="flex items-center gap-1 ml-auto">' +
-                            actionButtonHtml +
-                            '<button onclick="resetAccountDays(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-reset"><i class="fa-solid fa-rotate-left text-[9px]"></i> Reset</button>' +
-                        '</div>' +
-                    '</div>';
-            }
         }
 
         window.toggleEditPoints = function(accId, appType) {
@@ -576,14 +545,15 @@
                     showCustomAlert('Error', 'Please enter a valid points value!');
                     return;
                 }
-                const rule = appRules[appType] || appRules['poppo'];
+                
+                const rule = getAppRule(appType);
                 let calculatedDays = Math.floor(newPoints / rule.daily);
 
                 showCustomConfirm('Save Points', 'Save entered points (' + newPoints + ' pts) and days (' + calculatedDays + ' days)?', (confirmed) => {
                     if (confirmed) {
                         daysCache[accId] = newPoints;
                         localStorage.setItem(accId + '_earned_points', newPoints);
-                        daysRef.child(accId).set(newPoints);
+                        if (daysRef) daysRef.child(accId).set(newPoints);
                         editingStates[accId] = false;
                         refreshSingleTrackerUI(accId, appType);
                     }
@@ -597,10 +567,129 @@
                     editingStates[accId] = false;
                     daysCache[accId] = 0;
                     localStorage.setItem(accId + '_earned_points', 0);
-                    daysRef.child(accId).set(0);
+                    if (daysRef) daysRef.child(accId).set(0);
                     refreshSingleTrackerUI(accId, appType);
                 }
             });
+        }
+
+        function refreshSingleTrackerUI(accId, appType) {
+            const statsContainer = document.getElementById(accId + '_stats');
+            if (statsContainer) {
+                const stats = getAccountStats(accId, appType);
+                const isEditing = editingStates[accId] || false;
+
+                let pointsDisplayHtml = isEditing 
+                    ? '<input type="number" id="' + accId + '_input" value="' + stats.earnedPoints + '" class="point-input" step="any" min="0">'
+                    : '<strong class="text-amber-400 font-extrabold">' + stats.earnedFormatted + '</strong>';
+
+                let actionButtonHtml = isEditing 
+                    ? '<button onclick="saveAccountPoints(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-save" title="Save"><i class="fa-solid fa-floppy-disk text-[10px]"></i> Save</button>'
+                    : '<button onclick="toggleEditPoints(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-edit" title="Edit"><i class="fa-solid fa-pen-to-square text-[10px]"></i> Edit</button>';
+
+                statsContainer.innerHTML = 
+                    '<div class="flex justify-between items-center text-slate-200 font-semibold">' +
+                        '<span><i class="fa-regular fa-calendar-check text-amber-400 mr-1"></i>Days: <strong class="text-amber-400 font-bold">' + stats.daysWorked + ' d</strong></span>' +
+                        '<span><i class="fa-solid fa-coins text-yellow-400 blink-icon mr-1"></i>Points: ' + pointsDisplayHtml + ' / <span class="text-slate-300 font-bold">' + stats.targetFormatted + '</span></span>' +
+                    '</div>' +
+                    '<div class="flex justify-between items-center text-slate-300 mt-1 flex-wrap gap-1">' +
+                        '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-hourglass-start mr-1"></i>Days Left: ' + stats.remainingDays + '</span>' +
+                        '<div class="flex items-center gap-1 ml-auto">' +
+                            actionButtonHtml +
+                            '<button onclick="resetAccountDays(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-reset" title="Reset"><i class="fa-solid fa-rotate-left text-[9px]"></i> Reset</button>' +
+                        '</div>' +
+                    '</div>';
+            }
+            updatePoppoAccountsModalList();
+        }
+
+        // በዳታ ውስጥ ያሉትን ሁሉንም አፖች (የተለመዱትንም ሆነ አዲስ የተጨመሩትን) በራስ-ሰር ፈልጎ ማጣሪያ (Filter) Tab የሚፈጥር ፈንክሽን
+        function updateTrackerFilters() {
+            const container = document.getElementById('tracker-filters-container');
+            if (!container) return;
+
+            let foundApps = new Set();
+            devicesData.forEach(dev => {
+                Object.keys(dev).forEach(key => {
+                    if (key !== 'id' && key !== 'name' && key !== 'color' && Array.isArray(dev[key])) {
+                        foundApps.add(key);
+                    }
+                });
+            });
+
+            let html = '<button class="filter-tab ' + (currentFilter === 'all' ? 'active' : '') + '" data-filter="all">All</button>';
+            foundApps.forEach(app => {
+                let isActive = currentFilter === app ? 'active' : '';
+                let rule = getAppRule(app);
+                html += '<button class="filter-tab ' + isActive + '" data-filter="' + app + '">' + rule.name + '</button>';
+            });
+
+            container.innerHTML = html;
+
+            container.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    container.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.getAttribute('data-filter');
+                    updatePoppoAccountsModalList();
+                });
+            });
+        }
+
+        function updatePoppoAccountsModalList() {
+            const container = document.getElementById('accounts-list-container');
+            if (!container) return;
+
+            let allAccounts = [];
+            devicesData.forEach(dev => {
+                Object.keys(dev).forEach(key => {
+                    if (key !== 'id' && key !== 'name' && key !== 'color' && Array.isArray(dev[key])) {
+                        dev[key].forEach(acc => {
+                            allAccounts.push({ name: acc.name, devName: dev.name, color: dev.color || 'from-blue-500 to-cyan-500', ...getAccountStats(acc.id, key) });
+                        });
+                    }
+                });
+            });
+
+            let filtered = allAccounts.filter(acc => {
+                if (currentFilter === 'all') return true;
+                return acc.appType === currentFilter;
+            });
+
+            filtered.sort((a, b) => a.remainingDays - b.remainingDays);
+
+            let html = '';
+            filtered.forEach(acc => {
+                const isUrgent = acc.remainingDays <= 10;
+                const ruleConfig = getAppRule(acc.appType);
+                
+                html += '<div class="account-item-card border ' + (isUrgent ? 'border-emerald-500/80 shadow-lg shadow-emerald-500/10' : 'border-slate-700/50') + ' rounded-2xl p-3 flex items-center justify-between gap-3">' +
+                    '<div class="flex items-center gap-3 min-w-0">' +
+                        '<div class="w-10 h-10 rounded-xl bg-gradient-to-br ' + acc.color + ' flex items-center justify-center text-white flex-shrink-0 shadow">' +
+                            '<i class="fa-solid fa-video text-xs"></i>' +
+                        '</div>' +
+                        '<div class="min-w-0">' +
+                            '<div class="flex items-center gap-1.5">' +
+                                '<h4 class="text-xs font-bold text-slate-100 truncate">' + acc.name + '</h4>' +
+                                '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase ' + ruleConfig.badgeColor + '">' + acc.appType + '</span>' +
+                            '</div>' +
+                            '<p class="text-[10px] text-slate-400 mt-0.5">Device: <span class="text-slate-300 font-semibold">' + acc.devName + '</span> | Days Done: <span class="text-amber-400 font-bold">' + acc.daysWorked + 'd</span></p>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="text-right flex-shrink-0">' +
+                        '<div class="' + (isUrgent ? 'text-emerald-400 font-extrabold text-xs urgent-pulse bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/40' : 'text-amber-400 font-bold text-xs') + '">' +
+                            acc.remainingDays + ' DAYS LEFT!' +
+                        '</div>' +
+                        '<span class="text-[9px] text-slate-400 block mt-1">' + acc.earnedFormatted + ' / ' + ruleConfig.targetFormatted + ' pts</span>' +
+                    '</div>' +
+                '</div>';
+            });
+
+            if (filtered.length === 0) {
+                html = '<p class="text-center text-xs text-slate-500 py-6">No accounts found for this filter.</p>';
+            }
+
+            container.innerHTML = html;
         }
 
         function toEthiopianDate(date) {
@@ -636,7 +725,9 @@
             }
             let targetTime = new Date();
             targetTime.setHours(19, 0, 0, 0);
-            if (now >= targetTime) targetTime.setDate(targetTime.getDate() + 1);
+            if (now >= targetTime) {
+                targetTime.setDate(targetTime.getDate() + 1);
+            }
             let diff = targetTime - now;
             let hours = Math.floor(diff / (1000 * 60 * 60));
             let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -647,13 +738,43 @@
             }
         }
 
+        function autoResetTasks() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            let updates = {};
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                localStorage.removeItem(cb.id);
+                updates[cb.id] = false;
+            });
+            if (tasksRef) tasksRef.update(updates);
+            updateProgressLocal();
+        }
+
+        function playVictorySound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [261.63, 329.63, 392.00, 523.25];
+                notes.forEach((freq, index) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.frequency.value = freq;
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + index * 0.12);
+                    osc.stop(ctx.currentTime + index * 0.12 + 0.2);
+                });
+            } catch(e) {}
+        }
+
         function countDeviceTasks(dev) {
             let count = 0;
-            if (dev.poppo) dev.poppo.forEach(p => { count += 2; });
-            if (dev.desdes) count += dev.desdes.length;
-            if (dev.tello) count += dev.tello.length;
-            if (dev.kaya) count += dev.kaya.length;
-            if (dev.yago) count += dev.yago.length;
+            Object.keys(dev).forEach(key => {
+                if (key !== 'id' && key !== 'name' && key !== 'color' && Array.isArray(dev[key])) {
+                    const list = dev[key];
+                    if (key === 'poppo') count += list.length * 2;
+                    else count += list.length;
+                }
+            });
             return count;
         }
 
@@ -661,22 +782,27 @@
             const dev = devicesData.find(d => d.id === devId);
             if (!dev) return { total: 0, done: 0 };
             let total = 0, done = 0;
-            if (dev.poppo) dev.poppo.forEach(p => {
-                total += 2;
-                const liveEl = document.getElementById(p.id + '_live');
-                const partyEl = document.getElementById(p.id + '_party');
-                if ((liveEl && liveEl.checked) || localStorage.getItem(p.id + '_live') === 'true') done++;
-                if ((partyEl && partyEl.checked) || localStorage.getItem(p.id + '_party') === 'true') done++;
-            });
-            ['desdes', 'tello', 'kaya', 'yago'].forEach(appKey => {
-                if (dev[appKey]) {
-                    dev[appKey].forEach(item => {
+            
+            if (dev.poppo) {
+                dev.poppo.forEach(p => {
+                    total += 2;
+                    const liveEl = document.getElementById(p.id + '_live');
+                    const partyEl = document.getElementById(p.id + '_party');
+                    if ((liveEl && liveEl.checked) || localStorage.getItem(p.id + '_live') === 'true') done++;
+                    if ((partyEl && partyEl.checked) || localStorage.getItem(p.id + '_party') === 'true') done++;
+                });
+            }
+
+            Object.keys(dev).forEach(key => {
+                if (key !== 'id' && key !== 'name' && key !== 'color' && key !== 'poppo' && Array.isArray(dev[key])) {
+                    dev[key].forEach(t => {
                         total++;
-                        const el = document.getElementById(item.id);
-                        if ((el && el.checked) || localStorage.getItem(item.id) === 'true') done++;
+                        const el = document.getElementById(t.id);
+                        if ((el && el.checked) || localStorage.getItem(t.id) === 'true') done++;
                     });
                 }
             });
+
             return { total, done };
         }
 
@@ -684,87 +810,83 @@
             let earnedPoints = daysCache[accId] !== undefined ? parseFloat(daysCache[accId]) : parseFloat(localStorage.getItem(accId + '_earned_points') || '0');
             if (isNaN(earnedPoints)) earnedPoints = 0;
 
-            const rule = appRules[appType] || appRules['poppo'];
-            if (isChecked) earnedPoints += rule.daily;
-            else earnedPoints = Math.max(0, earnedPoints - rule.daily);
+            const rule = getAppRule(appType);
+            const dailyPoints = rule.daily; 
+            
+            if (isChecked) {
+                earnedPoints += dailyPoints;
+            } else {
+                earnedPoints = Math.max(0, earnedPoints - dailyPoints);
+            }
             
             daysCache[accId] = earnedPoints;
             localStorage.setItem(accId + '_earned_points', earnedPoints);
-            daysRef.child(accId).set(earnedPoints);
+            if (daysRef) daysRef.child(accId).set(earnedPoints);
             refreshSingleTrackerUI(accId, appType);
         }
 
         function createTrackerBadgeHtml(accId, appType) {
             const stats = getAccountStats(accId, appType);
+            const rule = getAppRule(appType);
             return '<div id="' + accId + '_stats" class="hidden my-2 p-2.5 bg-slate-900/95 rounded-xl border border-slate-700 text-[10px] space-y-1.5 shadow-inner">' +
                 '<div class="flex justify-between items-center text-slate-200 font-medium">' +
                     '<span><i class="fa-regular fa-calendar-check text-amber-400 mr-1"></i>Days: <strong class="text-amber-400 font-bold">' + stats.daysWorked + ' d</strong></span>' +
-                    '<span><i class="fa-solid fa-coins text-yellow-400 blink-icon mr-1"></i>Points: <strong class="text-amber-400 font-extrabold">' + stats.earnedFormatted + '</strong> / <span class="text-slate-300 font-bold">' + stats.targetFormatted + '</span></span>' +
+                    '<span><i class="fa-solid fa-coins text-yellow-400 blink-icon mr-1"></i>Points: <strong class="text-amber-400 font-extrabold">' + stats.earnedFormatted + '</strong> / <span class="text-slate-300 font-bold">' + rule.targetFormatted + '</span></span>' +
                 '</div>' +
                 '<div class="flex justify-between items-center text-slate-300 mt-1 flex-wrap gap-1">' +
                     '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-hourglass-start mr-1"></i>Days Left: ' + stats.remainingDays + '</span>' +
                     '<div class="flex items-center gap-1 ml-auto">' +
-                        '<button onclick="toggleEditPoints(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-edit"><i class="fa-solid fa-pen-to-square text-[10px]"></i> Edit</button>' +
-                        '<button onclick="resetAccountDays(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-reset"><i class="fa-solid fa-rotate-left text-[9px]"></i> Reset</button>' +
+                        '<button onclick="toggleEditPoints(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-edit" title="Edit"><i class="fa-solid fa-pen-to-square text-[10px]"></i> Edit</button>' +
+                        '<button onclick="resetAccountDays(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-reset" title="Reset"><i class="fa-solid fa-rotate-left text-[9px]"></i> Reset</button>' +
                     '</div>' +
                 '</div>' +
             '</div>';
-        }
-
-        function renderPhoneFiltersBar() {
-            const container = document.getElementById('phone-filters-container');
-            if (!container) return;
-
-            let html = '<button class="phone-filter-btn ' + (currentPhoneFilter === 'all' ? 'active' : '') + '" data-phone="all">All</button>';
-            devicesData.forEach(dev => {
-                html += '<button class="phone-filter-btn ' + (currentPhoneFilter === dev.id ? 'active' : '') + '" data-phone="' + dev.id + '">' + dev.name + '</button>';
-            });
-            container.innerHTML = html;
-
-            document.querySelectorAll('.phone-filter-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.phone-filter-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentPhoneFilter = this.getAttribute('data-phone');
-                    renderDashboard();
-                });
-            });
         }
 
         function renderDashboard() {
             const container = document.getElementById('devices-container');
             if (!container) return;
 
-            renderPhoneFiltersBar();
+            const savedStates = {};
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                savedStates[cb.id] = cb.checked;
+            });
 
             if (devicesData.length === 0) {
-                container.innerHTML = '';
+                container.innerHTML = `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
+                        <p class="text-slate-400 text-sm mb-3">No devices or accounts found yet.</p>
+                        <a href="setup.html" class="inline-block bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-4 py-2 rounded-lg text-xs transition">
+                            + Add Your First Device & App
+                        </a>
+                    </div>
+                `;
                 return;
             }
 
-            const savedStates = {};
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => { savedStates[cb.id] = cb.checked; });
-
             let fullHtml = '';
-            let filteredDevices = devicesData.filter(dev => currentPhoneFilter === 'all' || dev.id === currentPhoneFilter);
+            let filteredDevices = devicesData.filter(dev => {
+                if (currentPhoneFilter === 'all') return true;
+                return dev.id === currentPhoneFilter;
+            });
 
             filteredDevices.forEach((dev, idx) => {
                 const totalTasks = countDeviceTasks(dev);
                 
-                fullHtml += '<div class="device-card rounded-2xl p-4 shadow-lg">' +
+                fullHtml += '<div class="device-card rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 mb-4">' +
                     '<div class="flex items-center justify-between mb-3">' +
                         '<div class="flex items-center gap-3 min-w-0 pr-2">' +
                             '<div class="w-9 h-9 rounded-xl bg-gradient-to-br ' + (dev.color || 'from-blue-500 to-cyan-500') + ' flex items-center justify-center shadow-lg flex-shrink-0">' +
                                 '<i class="fa-solid fa-mobile-button text-white text-sm"></i>' +
                             '</div>' +
                             '<div class="min-w-0">' +
-                                '<h3 class="phone-title text-slate-100 truncate">' + (idx + 1) + '. ' + dev.name + '</h3>' +
+                                '<h3 class="phone-title text-slate-100 truncate">' + dev.name + '</h3>' +
                                 '<p class="text-[10px] text-slate-400">' + totalTasks + ' tasks</p>' +
                             '</div>' +
                         '</div>' +
                         '<div class="flex items-center gap-1.5 flex-shrink-0">' +
-                            '<span id="badge-' + dev.id + '" class="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-700 text-slate-300">Pending</span>' +
-                            '<span id="pct-' + dev.id + '" class="text-base font-extrabold text-amber-400">0%</span>' +
+                            '<span id="badge-' + dev.id + '" class="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-700 text-slate-300 transition-all whitespace-nowrap">Pending</span>' +
+                            '<span id="pct-' + dev.id + '" class="text-base font-extrabold text-amber-400 whitespace-nowrap">0%</span>' +
                         '</div>' +
                     '</div>' +
                     '<div class="w-full device-progress-bg h-2 rounded-full overflow-hidden mb-4">' +
@@ -772,46 +894,69 @@
                     '</div>' +
                     '<div class="space-y-3">';
 
-                // Poppo items
-                if (dev.poppo && dev.poppo.length > 0) {
-                    fullHtml += '<div class="flex items-center gap-2 mb-1"><i class="fa-solid fa-video text-rose-400 text-[10px]"></i><p class="app-header text-rose-400">Poppo Live</p></div>';
-                    dev.poppo.forEach(p => {
+                // 1. Poppo Live (ልዩ አያያዝ ያለው ሁለት sub-task ያለው)
+                const poppoList = dev.poppo || [];
+                if (poppoList.length > 0) {
+                    fullHtml += '<div class="flex items-center gap-2 mb-1">' +
+                        '<i class="fa-solid fa-video text-rose-400 text-[10px]"></i>' +
+                        '<p class="app-header text-rose-400">Poppo Live <span class="text-slate-500">(' + poppoList.length + ')</span></p>' +
+                    '</div>';
+                    poppoList.forEach(p => {
                         fullHtml += '<div class="account-item-card rounded-xl overflow-hidden mb-2 p-1">' +
                             '<div class="task-row flex items-center justify-between p-2.5 rounded-lg">' +
                                 '<div class="flex items-center gap-2.5 min-w-0">' +
-                                    '<input type="checkbox" id="' + p.id + '_master" data-type="master" data-prefix="' + p.id + '" data-app="poppo" class="checkbox-custom">' +
-                                    '<label for="' + p.id + '_master" class="task-label text-amber-300 cursor-pointer truncate">' + p.name + '</label>' +
+                                    '<input type="checkbox" id="' + p.id + '_master" data-type="master" data-prefix="' + p.id + '" data-app="poppo" class="checkbox-custom w-5 h-5 accent-emerald-500 rounded cursor-pointer flex-shrink-0">' +
+                                    '<label for="' + p.id + '_master" class="task-label text-amber-300 cursor-pointer select-none truncate">' + p.name + '</label>' +
                                 '</div>' +
                                 '<div class="flex items-center gap-1.5 flex-shrink-0 ml-2">' +
-                                    '<button class="toggle-btn btn-view-tracker" data-target="' + p.id + '_stats"><i class="fa-solid fa-chart-line"></i></button>' +
-                                    '<button class="toggle-btn text-slate-400 hover:text-white p-1" data-target="' + p.id + '_details"><i class="fa-solid fa-chevron-down text-xs"></i></button>' +
+                                    '<button class="toggle-btn btn-view-tracker" data-target="' + p.id + '_stats" title="Toggle Tracker">' +
+                                        '<i class="fa-solid fa-chart-line"></i>' +
+                                    '</button>' +
+                                    '<button class="toggle-btn text-slate-400 hover:text-white p-1 transition" data-target="' + p.id + '_details">' +
+                                        '<i class="fa-solid fa-chevron-down text-xs"></i>' +
+                                    '</button>' +
                                 '</div>' +
                             '</div>' +
                             '<div class="px-2.5">' + createTrackerBadgeHtml(p.id, 'poppo') + '</div>' +
                             '<div id="' + p.id + '_details" class="hidden p-2.5 border-t border-slate-700/30 space-y-2 bg-slate-900/30 rounded-b-xl">' +
-                                '<div class="flex items-center gap-2.5 pl-1"><input type="checkbox" id="' + p.id + '_live" data-type="sub" data-prefix="' + p.id + '" class="checkbox-custom sub"><label for="' + p.id + '_live" class="sub-task-label text-slate-300">Live</label></div>' +
-                                '<div class="flex items-center gap-2.5 pl-1"><input type="checkbox" id="' + p.id + '_party" data-type="sub" data-prefix="' + p.id + '" class="checkbox-custom sub"><label for="' + p.id + '_party" class="sub-task-label text-slate-300">Party</label></div>' +
+                                '<div class="flex items-center gap-2.5 pl-1">' +
+                                    '<input type="checkbox" id="' + p.id + '_live" data-type="sub" data-prefix="' + p.id + '" class="checkbox-custom sub accent-emerald-500 rounded cursor-pointer flex-shrink-0">' +
+                                    '<label for="' + p.id + '_live" class="sub-task-label text-slate-300 cursor-pointer select-none">Live</label>' +
+                                '</div>' +
+                                '<div class="flex items-center gap-2.5 pl-1">' +
+                                    '<input type="checkbox" id="' + p.id + '_party" data-type="sub" data-prefix="' + p.id + '" class="checkbox-custom sub accent-emerald-500 rounded cursor-pointer flex-shrink-0">' +
+                                    '<label for="' + p.id + '_party" class="sub-task-label text-slate-300 cursor-pointer select-none">Party</label>' +
+                                '</div>' +
                             '</div>' +
                         '</div>';
                     });
                 }
 
-                // Other standalone apps (desdes, tello, kaya, yago)
-                ['desdes', 'tello', 'kaya', 'yago'].forEach(appKey => {
-                    if (dev[appKey] && dev[appKey].length > 0) {
-                        fullHtml += '<div class="flex items-center gap-2 mt-2 mb-1"><p class="app-header text-blue-400">' + appKey + ' live</p></div>';
-                        dev[appKey].forEach(item => {
-                            fullHtml += '<div class="account-item-card rounded-xl p-2.5 mb-2">' +
-                                '<div class="task-row flex items-center justify-between">' +
-                                    '<div class="flex items-center gap-2.5 min-w-0">' +
-                                        '<input type="checkbox" id="' + item.id + '" data-type="standalone" data-acc="' + item.id + '" data-app="' + appKey + '" class="checkbox-custom">' +
-                                        '<label for="' + item.id + '" class="task-label text-slate-200 cursor-pointer truncate">' + item.name + '</label>' +
-                                    '</div>' +
-                                    '<button class="toggle-btn btn-view-tracker flex-shrink-0 ml-2" data-target="' + item.id + '_stats"><i class="fa-solid fa-chart-line"></i></button>' +
-                                '</div>' +
-                                createTrackerBadgeHtml(item.id, appKey) +
+                // 2. Desdes እና ሌሎች ማንኛውም ተጠቃሚው አድ የሚያደርጋቸው አፖች (እንደ ደስደስ በአንድ ቲክ የሚሰሩ)
+                Object.keys(dev).forEach(key => {
+                    if (key !== 'id' && key !== 'name' && key !== 'color' && key !== 'poppo' && Array.isArray(dev[key])) {
+                        const list = dev[key];
+                        if (list.length > 0) {
+                            let rule = getAppRule(key);
+                            fullHtml += '<div class="flex items-center gap-2 mt-2 mb-1">' +
+                                '<i class="fa-solid fa-tower-broadcast text-blue-400 text-[10px]"></i>' +
+                                '<p class="app-header text-blue-400">' + rule.name + ' <span class="text-slate-500">(' + list.length + ')</span></p>' +
                             '</div>';
-                        });
+                            list.forEach(t => {
+                                fullHtml += '<div class="account-item-card rounded-xl p-2.5 mb-2">' +
+                                    '<div class="task-row flex items-center justify-between">' +
+                                        '<div class="flex items-center gap-2.5 min-w-0">' +
+                                            '<input type="checkbox" id="' + t.id + '" data-type="standalone" data-acc="' + t.id + '" data-app="' + key + '" class="checkbox-custom w-5 h-5 accent-emerald-500 rounded cursor-pointer flex-shrink-0">' +
+                                            '<label for="' + t.id + '" class="task-label text-slate-200 cursor-pointer select-none truncate">' + t.name + '</label>' +
+                                        '</div>' +
+                                        '<button class="toggle-btn btn-view-tracker flex-shrink-0 ml-2" data-target="' + t.id + '_stats" title="Toggle Tracker">' +
+                                            '<i class="fa-solid fa-chart-line"></i>' +
+                                        '</button>' +
+                                    '</div>' +
+                                    createTrackerBadgeHtml(t.id, key) +
+                                '</div>';
+                            });
+                        }
                     }
                 });
 
@@ -820,8 +965,14 @@
             container.innerHTML = fullHtml;
             
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                if (savedStates[cb.id] !== undefined) cb.checked = savedStates[cb.id];
-                else if (localStorage.getItem(cb.id) === 'true') cb.checked = true;
+                if (savedStates[cb.id] !== undefined) {
+                    cb.checked = savedStates[cb.id];
+                } else {
+                    const storedVal = localStorage.getItem(cb.id);
+                    if (storedVal === 'true') {
+                        cb.checked = true;
+                    }
+                }
             });
 
             rebindDynamicElements();
@@ -833,8 +984,13 @@
                     const targetId = this.getAttribute('data-target');
                     const el = document.getElementById(targetId);
                     if (el) {
-                        el.classList.toggle('hidden');
-                        this.classList.toggle('open');
+                        if (el.classList.contains('hidden')) {
+                            el.classList.remove('hidden');
+                            this.classList.add('open');
+                        } else {
+                            el.classList.add('hidden');
+                            this.classList.remove('open');
+                        }
                     }
                 });
             });
@@ -843,24 +999,96 @@
                 cb.addEventListener('change', function() {
                     const type = this.getAttribute('data-type');
                     const prefix = this.getAttribute('data-prefix');
-                    if (!this.checked) {
-                        showCustomConfirm('Confirmation', 'Do you want to uncheck this task?', (confirmed) => {
-                            if (!confirmed) this.checked = true;
-                            else processCheckboxChange(this, type, prefix);
+                    const checkboxElem = this;
+
+                    if (!checkboxElem.checked) {
+                        showCustomConfirm('ማረጋገጫ', 'ይህን ታክ ማጥፋት ይፈልጋሉ?', (confirmed) => {
+                            if (!confirmed) {
+                                checkboxElem.checked = true;
+                            } else {
+                                processCheckboxChange(checkboxElem, type, prefix);
+                            }
                         });
                     } else {
-                        processCheckboxChange(this, type, prefix);
+                        processCheckboxChange(checkboxElem, type, prefix);
                     }
                 });
             });
             updateProgressLocal();
         }
 
+        function setupEventListeners() {
+            const menuToggle = document.getElementById('menu-toggle-btn');
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            const accountsModal = document.getElementById('accounts-modal');
+            const closeAccountsModal = document.getElementById('close-accounts-modal');
+            const menuAccountsBtn = document.getElementById('menu-accounts-btn');
+            const menuLogoutBtn = document.getElementById('menu-logout-btn');
+
+            menuToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', () => {
+                dropdownMenu.classList.add('hidden');
+            });
+
+            dropdownMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            menuAccountsBtn.addEventListener('click', () => {
+                dropdownMenu.classList.add('hidden');
+                updateTrackerFilters();
+                updatePoppoAccountsModalList();
+                accountsModal.classList.remove('hidden');
+            });
+
+            closeAccountsModal.addEventListener('click', () => {
+                accountsModal.classList.add('hidden');
+            });
+
+            if (menuLogoutBtn) {
+                menuLogoutBtn.addEventListener('click', () => {
+                    dropdownMenu.classList.add('hidden');
+                    showCustomConfirm('Sign out', 'ከአካውንትዎ መውצאት ይፈልጋሉ?', (confirmed) => {
+                        if (confirmed) {
+                            auth.signOut().then(() => {
+                                localStorage.clear();
+                                window.location.href = "index.html";
+                            }).catch(() => {
+                                localStorage.clear();
+                                window.location.href = "index.html";
+                            });
+                        }
+                    });
+                });
+            }
+
+            document.getElementById('notify-btn').addEventListener('click', function() {
+                if(window.requestNotificationPermission) {
+                    window.requestNotificationPermission();
+                }
+            });
+            
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                showCustomConfirm('ማረጋገጫ', 'የዛሬዎችን ቲኮች ብቻ መመለስ (Reset) ይፈልጋሉ?', (confirmed) => {
+                    if (confirmed) {
+                        autoResetTasks();
+                    }
+                });
+            });
+        }
+
         function processCheckboxChange(checkboxElem, type, prefix) {
             if (type === 'master') {
                 const live = document.getElementById(prefix + '_live');
                 const party = document.getElementById(prefix + '_party');
-                if (live && party) { live.checked = checkboxElem.checked; party.checked = checkboxElem.checked; }
+                if (live && party) {
+                    live.checked = checkboxElem.checked;
+                    party.checked = checkboxElem.checked;
+                }
                 updateAccountPointsIncrement(prefix, 'poppo', checkboxElem.checked);
             } else if (type === 'sub') {
                 const master = document.getElementById(prefix + '_master');
@@ -876,23 +1104,25 @@
             } else if (type === 'standalone') {
                 const accId = checkboxElem.getAttribute('data-acc');
                 const appType = checkboxElem.getAttribute('data-app');
-                if (accId && appType) updateAccountPointsIncrement(accId, appType, checkboxElem.checked);
+                if (accId && appType) {
+                    updateAccountPointsIncrement(accId, appType, checkboxElem.checked);
+                }
             }
             syncProgressToFirebase();
         }
 
         function syncProgressToFirebase() {
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
             let updates = {};
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            allCheckboxes.forEach(cb => {
                 updates[cb.id] = cb.checked;
                 localStorage.setItem(cb.id, cb.checked);
             });
-            tasksRef.update(updates);
+            if (tasksRef) tasksRef.update(updates);
             updateProgressLocal();
         }
 
         function updateProgressLocal() {
-            let phonesDoneCount = 0;
             devicesData.forEach(dev => {
                 const prog = getDeviceProgress(dev.id);
                 const devPct = prog.total > 0 ? Math.round((prog.done / prog.total) * 100) : 0;
@@ -904,120 +1134,160 @@
                 if (badge) {
                     if (devPct === 100) {
                         badge.innerText = '✓ Completed';
-                        badge.className = 'completed-badge text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-                        phonesDoneCount++;
+                        badge.className = 'completed-badge text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all whitespace-nowrap';
                     } else if (devPct > 0) {
                         badge.innerText = 'In Progress';
-                        badge.className = 'text-[10px] font-bold px-2 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                        badge.className = 'text-[10px] font-bold px-2 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all whitespace-nowrap';
                     } else {
                         badge.innerText = 'Pending';
-                        badge.className = 'text-[10px] font-bold px-2 py-1 rounded-full bg-slate-700 text-slate-400';
+                        badge.className = 'text-[10px] font-bold px-2 py-1 rounded-full bg-slate-700 text-slate-400 border border-slate-600 transition-all whitespace-nowrap';
                     }
                 }
             });
 
-            let totalPossible = 0, totalChecked = 0;
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                totalPossible++;
-                if (cb.checked) totalChecked++;
+            let phonesDoneCount = 0;
+            devicesData.forEach(dev => {
+                const prog = getDeviceProgress(dev.id);
+                if (prog.total > 0 && prog.done === prog.total) phonesDoneCount++;
             });
 
-            const overallPercentage = totalPossible > 0 ? Math.round((totalChecked / totalPossible) * 100) : 0;
+            let totalCheckedAll = 0;
+            const allPossibleIds = [];
+            devicesData.forEach(d => {
+                if (d.poppo) {
+                    d.poppo.forEach(p => { allPossibleIds.push(p.id + '_live'); allPossibleIds.push(p.id + '_party'); });
+                }
+                Object.keys(d).forEach(key => {
+                    if (key !== 'id' && key !== 'name' && key !== 'color' && key !== 'poppo' && Array.isArray(d[key])) {
+                        d[key].forEach(t => { allPossibleIds.push(t.id); });
+                    }
+                });
+            });
+            
+            let totalPossibleTasksCount = allPossibleIds.length;
+            allPossibleIds.forEach(id => {
+                const el = document.getElementById(id);
+                if ((el && el.checked) || localStorage.getItem(id) === 'true') {
+                    totalCheckedAll++;
+                }
+            });
+
+            const overallPercentage = totalPossibleTasksCount > 0 ? Math.round((totalCheckedAll / totalPossibleTasksCount) * 100) : 0;
+
             const pBar = document.getElementById('progress-bar');
             const pText = document.getElementById('progress-text');
             if (pBar) pBar.style.width = overallPercentage + '%';
             if (pText) pText.innerText = overallPercentage + '%';
 
-            document.getElementById('stat-total').innerText = totalPossible;
-            document.getElementById('stat-done').innerText = totalChecked;
-            document.getElementById('stat-remaining').innerText = Math.max(0, totalPossible - totalChecked);
+            document.getElementById('stat-total').innerText = totalPossibleTasksCount;
+            document.getElementById('stat-done').innerText = totalCheckedAll;
+            document.getElementById('stat-remaining').innerText = Math.max(0, totalPossibleTasksCount - totalCheckedAll);
             document.getElementById('stat-phones-done').innerText = phonesDoneCount + '/' + devicesData.length;
 
             const congratsBanner = document.getElementById('congrats-banner');
-            if (overallPercentage === 100 && totalPossible > 0) {
-                congratsBanner.classList.remove('hidden');
+            if (overallPercentage === 100) {
+                if (congratsBanner) congratsBanner.classList.remove('hidden');
                 if (!celebrated) {
                     celebrated = true;
-                    if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+                    playVictorySound();
+                    if (typeof confetti === 'function') {
+                        confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+                    }
                 }
             } else {
-                congratsBanner.classList.add('hidden');
+                if (congratsBanner) congratsBanner.classList.add('hidden');
                 celebrated = false;
             }
         }
 
+        function updatePhoneFiltersBar() {
+            const row1Container = document.getElementById('phone-filters-row1');
+            const row2Container = document.getElementById('phone-filters-row2');
+            if (!row1Container || !row2Container) return;
+
+            let row1Html = '<button class="phone-filter-btn ' + (currentPhoneFilter === 'all' ? 'active' : '') + '" data-phone="all">All</button>';
+            let row2Html = '';
+
+            devicesData.forEach((dev, index) => {
+                const isActive = currentPhoneFilter === dev.id ? 'active' : '';
+                const btnHtml = '<button class="phone-filter-btn ' + isActive + '" data-phone="' + dev.id + '">' + dev.name.replace('Phone ', '') + '</button>';
+                
+                if (index < 3) {
+                    row1Html += btnHtml;
+                } else {
+                    row2Html += btnHtml;
+                }
+            });
+
+            row1Container.innerHTML = row1Html;
+            row2Container.innerHTML = row2Html;
+
+            document.querySelectorAll('.phone-filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.phone-filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentPhoneFilter = this.getAttribute('data-phone');
+                    renderDashboard();
+                });
+            });
+        }
+
         function initFirebaseListeners() {
             auth.onAuthStateChanged((user) => {
-                if (!user) window.location.href = "index.html";
-            });
-
-            // Load dynamic devices created by users
-            devicesRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    devicesData = Object.values(data);
+                if (!user) {
+                    window.location.href = "index.html";
                 } else {
-                    devicesData = [];
-                }
-                renderDashboard();
-            });
+                    const userId = user.uid;
+                    devicesRef = db.ref('users/' + userId + '/devices');
+                    tasksRef = db.ref('users/' + userId + '/tasks');
+                    daysRef = db.ref('users/' + userId + '/days');
 
-            tasksRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    Object.keys(data).forEach(id => {
-                        localStorage.setItem(id, data[id]);
-                        const cb = document.getElementById(id);
-                        if (cb) cb.checked = data[id];
+                    devicesRef.on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            devicesData = Object.values(data);
+                        } else {
+                            devicesData = [];
+                        }
+                        updatePhoneFiltersBar();
+                        renderDashboard();
                     });
-                    updateProgressLocal();
-                }
-            });
 
-            daysRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    daysCache = data;
-                    Object.keys(data).forEach(accId => {
-                        localStorage.setItem(accId + '_earned_points', data[accId]);
-                        let appType = 'poppo';
-                        if (accId.includes('tello')) appType = 'tello';
-                        else if (accId.includes('desdes')) appType = 'desdes';
-                        else if (accId.includes('kaya')) appType = 'kaya';
-                        else if (accId.includes('yago')) appType = 'yago';
-                        refreshSingleTrackerUI(accId, appType);
+                    tasksRef.on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            Object.keys(data).forEach(id => {
+                                localStorage.setItem(id, data[id]);
+                                const cb = document.getElementById(id);
+                                if (cb) {
+                                    cb.checked = data[id];
+                                }
+                            });
+                            updateProgressLocal();
+                        }
+                    });
+
+                    daysRef.on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            daysCache = data;
+                            Object.keys(data).forEach(accId => {
+                                localStorage.setItem(accId + '_earned_points', data[accId]);
+                                let appType = 'desdes';
+                                if (accId.includes('poppo')) appType = 'poppo';
+                                refreshSingleTrackerUI(accId, appType);
+                            });
+                        }
                     });
                 }
             });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
             initFirebaseListeners();
             setInterval(updateClockAndCountdown, 1000);
             updateClockAndCountdown();
-
-            // Toggle Dropdown Menu
-            const menuToggleBtn = document.getElementById('menu-toggle-btn');
-            const dropdownMenu = document.getElementById('dropdown-menu');
-
-            menuToggleBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                dropdownMenu.classList.toggle('show');
-            });
-
-            document.addEventListener('click', () => {
-                dropdownMenu.classList.remove('show');
-            });
-
-            document.getElementById('notify-btn').addEventListener('click', () => window.requestNotificationPermission());
-            document.getElementById('reset-btn').addEventListener('click', () => {
-                showCustomConfirm('Confirmation', 'Do you want to reset today ticks only?', (confirmed) => {
-                    if (confirmed) {
-                        document.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = false; localStorage.removeItem(cb.id); });
-                        syncProgressToFirebase();
-                    }
-                });
-            });
         });
     </script>
 </body>
