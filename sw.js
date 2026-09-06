@@ -1,47 +1,56 @@
-const CACHE_NAME = 'my-pwa-cache-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/script.js',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+const CACHE_NAME = 'task-controller-v1';
+const ASSETS_TO_CACHE = [
+  './index.html',
+  './setup.html',
+  './manifest.json'
 ];
 
-// 1. መጫን (Install Event) - አስፈላጊ ፋይሎችን በካሽ መያዝ
+// 1. Install Event - ፋይሎችን በ Cache ውስጥ ማስቀመጥ
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
   );
+  self.skipWaiting();
 });
 
-// 2. ማምጣት (Fetch Event) - ከइንተርኔት ወይም ከካሽ ማሳየት
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // ካሽ ውስጥ ከተገኘ ከዛው ይመልስ፣ ካልተገኘ ከइንተርኔት ያውርደው
-        return response || fetch(event.request);
-      })
-  );
-});
-
-// 3. ማዘመን (Activate Event) - አሮጌ ካሾችን ማጽዳት
+// 2. Activate Event - የቆዩ Cache ፋይሎችን ማጽዳት
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then((keys) => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (!cacheWhitelist.includes(cacheName)) {
-            return caches.delete(cacheName);
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
           }
         })
       );
+    })
+  );
+  self.clients.claim();
+});
+
+// 3. Fetch Event - ኢንተርኔት በሌለ ጊዜ ከ Cache ማሳየት
+self.addEventListener('fetch', (event) => {
+  // ከ Firebase ዳታቤዝ የሚመጡ ጥያቄዎችን አያያዝ (ለጊዜው በቀጥታ ወደ አውታረ መረብ እንዲሄድ መተው)
+  if (event.request.url.includes('firebaseio.com') || event.request.url.includes('googleapis.com')) {
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(event.request).then((response) => {
+        return response;
+      }).catch(() => {
+        // ኢንተርኔት ከሌለ እና ፋይሉ ካልተገኘ የሚሰጥ አማራጭ
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      });
     })
   );
 });
