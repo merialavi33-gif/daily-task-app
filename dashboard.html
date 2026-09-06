@@ -402,19 +402,28 @@
         let daysRef = null;
         let devicesRef = null;
 
-        // ነባር እና አዲስ የሚመጡ አፖችን የሚያስተናግድ ደንብ (ለፖፖ እና ደስደስ የራሳቸው ስታንዳርድ አላቸው፤ ሌላ አዲስ ቢገባ በነባሪ እንደ ደስደስ ዓይነት ስታንዳርድ ይይዛል)
-        const appRules = {
-            poppo: { daily: 2800, target: 100000, targetFormatted: "100k", maxDays: 36, name: "Poppo", badgeColor: "bg-rose-500/20 text-rose-400 border-rose-500/30" },
-            desdes: { daily: 10000, target: 1000000, targetFormatted: "1m", maxDays: 100, name: "desdes", badgeColor: "bg-blue-500/20 text-blue-400 border-blue-500/30" }
-        };
-
-        // ማናቸውንም አዲስ አፕ ሲገባ አውቶማቲክ ስታንዳርድ የሚሰጥ ፈንክሽን
-        function getAppRule(appType) {
-            if (appRules[appType]) {
-                return appRules[appType];
-            }
-            // ማንኛውም አዲስ አፕ ቢመጣ የደስደስን ስታንዳርድ (ዕለታዊ 10,000፣ ዒላማ 1ሚሊዮን) በነባሪ ይይዛል
+        // የየአፑን ሩል ከ Setup ፔጅ በሚመጣው daily reward እና ሌሎች መረጃዎች ላይ በመመስረት በየራሳቸው ስታንዳርድ የሚያስተናግድ ፈንክሽን
+        function getAppRule(appType, customDailyReward) {
             let capitalizedName = appType.charAt(0).toUpperCase() + appType.slice(1);
+            let daily = customDailyReward !== undefined && !isNaN(customDailyReward) ? parseFloat(customDailyReward) : null;
+
+            if (appType === 'poppo') {
+                return { daily: 2800, target: 100000, targetFormatted: "100k", maxDays: 36, name: "Poppo", badgeColor: "bg-rose-500/20 text-rose-400 border-rose-500/30" };
+            }
+
+            if (daily === 10000) {
+                return { daily: 10000, target: 1000000, targetFormatted: "1m", maxDays: 100, name: capitalizedName, badgeColor: "bg-blue-500/20 text-blue-400 border-blue-500/30" };
+            } else if (daily === 1200) {
+                return { daily: 1200, target: 100000, targetFormatted: "100k", maxDays: Math.ceil(100000 / 1200), name: capitalizedName, badgeColor: "bg-purple-500/20 text-purple-400 border-purple-500/30" };
+            } else if (daily === 1000) {
+                return { daily: 1000, target: 100000, targetFormatted: "100k", maxDays: 100, name: capitalizedName, badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
+            } else if (daily !== null) {
+                // ማንኛውም ሌላ የተለየ daily reward ሲኖር (ታርጌቱ በነባሪ 100k ተደርጎ በሂሳብ ይሰላል)
+                let target = 100000;
+                return { daily: daily, target: target, targetFormatted: "100k", maxDays: Math.ceil(target / daily), name: capitalizedName, badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
+            }
+
+            // መረጃ ካልተገኘ በነባሪ የደስደስ ስታንዳርድ
             return {
                 daily: 10000,
                 target: 1000000,
@@ -506,11 +515,11 @@
             return Number(points).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         }
 
-        function getAccountStats(accId, appType) {
+        function getAccountStats(accId, appType, customDailyReward) {
             let earnedPoints = daysCache[accId] !== undefined ? parseFloat(daysCache[accId]) : parseFloat(localStorage.getItem(accId + '_earned_points') || '0');
             if (isNaN(earnedPoints)) earnedPoints = 0;
             
-            const rule = getAppRule(appType);
+            const rule = getAppRule(appType, customDailyReward);
             let daysWorked = Math.floor(earnedPoints / rule.daily);
 
             const remainingPoints = Math.max(0, rule.target - earnedPoints);
@@ -528,16 +537,16 @@
             };
         }
 
-        window.toggleEditPoints = function(accId, appType) {
+        window.toggleEditPoints = function(accId, appType, customDailyReward) {
             showCustomConfirm('Edit Points', 'Do you want to edit points for this account?', (confirmed) => {
                 if (confirmed) {
                     editingStates[accId] = true;
-                    refreshSingleTrackerUI(accId, appType);
+                    refreshSingleTrackerUI(accId, appType, customDailyReward);
                 }
             });
         }
 
-        window.saveAccountPoints = function(accId, appType) {
+        window.saveAccountPoints = function(accId, appType, customDailyReward) {
             const inputElem = document.getElementById(accId + '_input');
             if (inputElem) {
                 let newPoints = parseFloat(inputElem.value);
@@ -546,7 +555,7 @@
                     return;
                 }
                 
-                const rule = getAppRule(appType);
+                const rule = getAppRule(appType, customDailyReward);
                 let calculatedDays = Math.floor(newPoints / rule.daily);
 
                 showCustomConfirm('Save Points', 'Save entered points (' + newPoints + ' pts) and days (' + calculatedDays + ' days)?', (confirmed) => {
@@ -555,28 +564,28 @@
                         localStorage.setItem(accId + '_earned_points', newPoints);
                         if (daysRef) daysRef.child(accId).set(newPoints);
                         editingStates[accId] = false;
-                        refreshSingleTrackerUI(accId, appType);
+                        refreshSingleTrackerUI(accId, appType, customDailyReward);
                     }
                 });
             }
         }
 
-        window.resetAccountDays = function(accId, appType) {
+        window.resetAccountDays = function(accId, appType, customDailyReward) {
             showCustomConfirm('Reset Account', 'Do you want to reset this account points and days to 0?', (confirmed) => {
                 if (confirmed) {
                     editingStates[accId] = false;
                     daysCache[accId] = 0;
                     localStorage.setItem(accId + '_earned_points', 0);
                     if (daysRef) daysRef.child(accId).set(0);
-                    refreshSingleTrackerUI(accId, appType);
+                    refreshSingleTrackerUI(accId, appType, customDailyReward);
                 }
             });
         }
 
-        function refreshSingleTrackerUI(accId, appType) {
+        function refreshSingleTrackerUI(accId, appType, customDailyReward) {
             const statsContainer = document.getElementById(accId + '_stats');
             if (statsContainer) {
-                const stats = getAccountStats(accId, appType);
+                const stats = getAccountStats(accId, appType, customDailyReward);
                 const isEditing = editingStates[accId] || false;
 
                 let pointsDisplayHtml = isEditing 
@@ -584,8 +593,8 @@
                     : '<strong class="text-amber-400 font-extrabold">' + stats.earnedFormatted + '</strong>';
 
                 let actionButtonHtml = isEditing 
-                    ? '<button onclick="saveAccountPoints(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-save" title="Save"><i class="fa-solid fa-floppy-disk text-[10px]"></i> Save</button>'
-                    : '<button onclick="toggleEditPoints(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-edit" title="Edit"><i class="fa-solid fa-pen-to-square text-[10px]"></i> Edit</button>';
+                    ? '<button onclick="saveAccountPoints(\'' + accId + '\', \'' + appType + '\', ' + (customDailyReward || 'null') + ')" class="btn-day-adjust btn-day-save" title="Save"><i class="fa-solid fa-floppy-disk text-[10px]"></i> Save</button>'
+                    : '<button onclick="toggleEditPoints(\'' + accId + '\', \'' + appType + '\', ' + (customDailyReward || 'null') + ')" class="btn-day-adjust btn-day-edit" title="Edit"><i class="fa-solid fa-pen-to-square text-[10px]"></i> Edit</button>';
 
                 statsContainer.innerHTML = 
                     '<div class="flex justify-between items-center text-slate-200 font-semibold">' +
@@ -596,14 +605,13 @@
                         '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-hourglass-start mr-1"></i>Days Left: ' + stats.remainingDays + '</span>' +
                         '<div class="flex items-center gap-1 ml-auto">' +
                             actionButtonHtml +
-                            '<button onclick="resetAccountDays(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-reset" title="Reset"><i class="fa-solid fa-rotate-left text-[9px]"></i> Reset</button>' +
+                            '<button onclick="resetAccountDays(\'' + accId + '\', \'' + appType + '\', ' + (customDailyReward || 'null') + ')" class="btn-day-adjust btn-day-reset" title="Reset"><i class="fa-solid fa-rotate-left text-[9px]"></i> Reset</button>' +
                         '</div>' +
                     '</div>';
             }
             updatePoppoAccountsModalList();
         }
 
-        // በዳታ ውስጥ ያሉትን ሁሉንም አፖች (የተለመዱትንም ሆነ አዲስ የተጨመሩትን) በራስ-ሰር ፈልጎ ማጣሪያ (Filter) Tab የሚፈጥር ፈንክሽን
         function updateTrackerFilters() {
             const container = document.getElementById('tracker-filters-container');
             if (!container) return;
@@ -620,7 +628,12 @@
             let html = '<button class="filter-tab ' + (currentFilter === 'all' ? 'active' : '') + '" data-filter="all">All</button>';
             foundApps.forEach(app => {
                 let isActive = currentFilter === app ? 'active' : '';
-                let rule = getAppRule(app);
+                let sampleAcc = null;
+                devicesData.forEach(d => {
+                    if (d[app] && Array.isArray(d[app]) && d[app].length > 0) sampleAcc = d[app][0];
+                });
+                let customDaily = sampleAcc ? sampleAcc.dailyReward : undefined;
+                let rule = getAppRule(app, customDaily);
                 html += '<button class="filter-tab ' + isActive + '" data-filter="' + app + '">' + rule.name + '</button>';
             });
 
@@ -645,7 +658,7 @@
                 Object.keys(dev).forEach(key => {
                     if (key !== 'id' && key !== 'name' && key !== 'color' && Array.isArray(dev[key])) {
                         dev[key].forEach(acc => {
-                            allAccounts.push({ name: acc.name, devName: dev.name, color: dev.color || 'from-blue-500 to-cyan-500', ...getAccountStats(acc.id, key) });
+                            allAccounts.push({ name: acc.name, devName: dev.name, color: dev.color || 'from-blue-500 to-cyan-500', dailyReward: acc.dailyReward, ...getAccountStats(acc.id, key, acc.dailyReward) });
                         });
                     }
                 });
@@ -661,7 +674,7 @@
             let html = '';
             filtered.forEach(acc => {
                 const isUrgent = acc.remainingDays <= 10;
-                const ruleConfig = getAppRule(acc.appType);
+                const ruleConfig = getAppRule(acc.appType, acc.dailyReward);
                 
                 html += '<div class="account-item-card border ' + (isUrgent ? 'border-emerald-500/80 shadow-lg shadow-emerald-500/10' : 'border-slate-700/50') + ' rounded-2xl p-3 flex items-center justify-between gap-3">' +
                     '<div class="flex items-center gap-3 min-w-0">' +
@@ -806,11 +819,11 @@
             return { total, done };
         }
 
-        function updateAccountPointsIncrement(accId, appType, isChecked) {
+        function updateAccountPointsIncrement(accId, appType, isChecked, customDailyReward) {
             let earnedPoints = daysCache[accId] !== undefined ? parseFloat(daysCache[accId]) : parseFloat(localStorage.getItem(accId + '_earned_points') || '0');
             if (isNaN(earnedPoints)) earnedPoints = 0;
 
-            const rule = getAppRule(appType);
+            const rule = getAppRule(appType, customDailyReward);
             const dailyPoints = rule.daily; 
             
             if (isChecked) {
@@ -822,12 +835,12 @@
             daysCache[accId] = earnedPoints;
             localStorage.setItem(accId + '_earned_points', earnedPoints);
             if (daysRef) daysRef.child(accId).set(earnedPoints);
-            refreshSingleTrackerUI(accId, appType);
+            refreshSingleTrackerUI(accId, appType, customDailyReward);
         }
 
-        function createTrackerBadgeHtml(accId, appType) {
-            const stats = getAccountStats(accId, appType);
-            const rule = getAppRule(appType);
+        function createTrackerBadgeHtml(accId, appType, customDailyReward) {
+            const stats = getAccountStats(accId, appType, customDailyReward);
+            const rule = getAppRule(appType, customDailyReward);
             return '<div id="' + accId + '_stats" class="hidden my-2 p-2.5 bg-slate-900/95 rounded-xl border border-slate-700 text-[10px] space-y-1.5 shadow-inner">' +
                 '<div class="flex justify-between items-center text-slate-200 font-medium">' +
                     '<span><i class="fa-regular fa-calendar-check text-amber-400 mr-1"></i>Days: <strong class="text-amber-400 font-bold">' + stats.daysWorked + ' d</strong></span>' +
@@ -836,8 +849,8 @@
                 '<div class="flex justify-between items-center text-slate-300 mt-1 flex-wrap gap-1">' +
                     '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-hourglass-start mr-1"></i>Days Left: ' + stats.remainingDays + '</span>' +
                     '<div class="flex items-center gap-1 ml-auto">' +
-                        '<button onclick="toggleEditPoints(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-edit" title="Edit"><i class="fa-solid fa-pen-to-square text-[10px]"></i> Edit</button>' +
-                        '<button onclick="resetAccountDays(\'' + accId + '\', \'' + appType + '\')" class="btn-day-adjust btn-day-reset" title="Reset"><i class="fa-solid fa-rotate-left text-[9px]"></i> Reset</button>' +
+                        '<button onclick="toggleEditPoints(\'' + accId + '\', \'' + appType + '\', ' + (customDailyReward || 'null') + ')" class="btn-day-adjust btn-day-edit" title="Edit"><i class="fa-solid fa-pen-to-square text-[10px]"></i> Edit</button>' +
+                        '<button onclick="resetAccountDays(\'' + accId + '\', \'' + appType + '\', ' + (customDailyReward || 'null') + ')" class="btn-day-adjust btn-day-reset" title="Reset"><i class="fa-solid fa-rotate-left text-[9px]"></i> Reset</button>' +
                     '</div>' +
                 '</div>' +
             '</div>';
@@ -894,7 +907,7 @@
                     '</div>' +
                     '<div class="space-y-3">';
 
-                // 1. Poppo Live (ልዩ አያያዝ ያለው ሁለት sub-task ያለው)
+                // 1. Poppo Live
                 const poppoList = dev.poppo || [];
                 if (poppoList.length > 0) {
                     fullHtml += '<div class="flex items-center gap-2 mb-1">' +
@@ -905,7 +918,7 @@
                         fullHtml += '<div class="account-item-card rounded-xl overflow-hidden mb-2 p-1">' +
                             '<div class="task-row flex items-center justify-between p-2.5 rounded-lg">' +
                                 '<div class="flex items-center gap-2.5 min-w-0">' +
-                                    '<input type="checkbox" id="' + p.id + '_master" data-type="master" data-prefix="' + p.id + '" data-app="poppo" class="checkbox-custom w-5 h-5 accent-emerald-500 rounded cursor-pointer flex-shrink-0">' +
+                                    '<input type="checkbox" id="' + p.id + '_master" data-type="master" data-prefix="' + p.id + '" data-app="poppo" data-daily="' + (p.dailyReward || '') + '" class="checkbox-custom w-5 h-5 accent-emerald-500 rounded cursor-pointer flex-shrink-0">' +
                                     '<label for="' + p.id + '_master" class="task-label text-amber-300 cursor-pointer select-none truncate">' + p.name + '</label>' +
                                 '</div>' +
                                 '<div class="flex items-center gap-1.5 flex-shrink-0 ml-2">' +
@@ -917,7 +930,7 @@
                                     '</button>' +
                                 '</div>' +
                             '</div>' +
-                            '<div class="px-2.5">' + createTrackerBadgeHtml(p.id, 'poppo') + '</div>' +
+                            '<div class="px-2.5">' + createTrackerBadgeHtml(p.id, 'poppo', p.dailyReward) + '</div>' +
                             '<div id="' + p.id + '_details" class="hidden p-2.5 border-t border-slate-700/30 space-y-2 bg-slate-900/30 rounded-b-xl">' +
                                 '<div class="flex items-center gap-2.5 pl-1">' +
                                     '<input type="checkbox" id="' + p.id + '_live" data-type="sub" data-prefix="' + p.id + '" class="checkbox-custom sub accent-emerald-500 rounded cursor-pointer flex-shrink-0">' +
@@ -932,12 +945,13 @@
                     });
                 }
 
-                // 2. Desdes እና ሌሎች ማንኛውም ተጠቃሚው አድ የሚያደርጋቸው አፖች (እንደ ደስደስ በአንድ ቲክ የሚሰሩ)
+                // 2. ሌሎች አፖች
                 Object.keys(dev).forEach(key => {
                     if (key !== 'id' && key !== 'name' && key !== 'color' && key !== 'poppo' && Array.isArray(dev[key])) {
                         const list = dev[key];
                         if (list.length > 0) {
-                            let rule = getAppRule(key);
+                            let sampleDaily = list[0].dailyReward;
+                            let rule = getAppRule(key, sampleDaily);
                             fullHtml += '<div class="flex items-center gap-2 mt-2 mb-1">' +
                                 '<i class="fa-solid fa-tower-broadcast text-blue-400 text-[10px]"></i>' +
                                 '<p class="app-header text-blue-400">' + rule.name + ' <span class="text-slate-500">(' + list.length + ')</span></p>' +
@@ -946,14 +960,14 @@
                                 fullHtml += '<div class="account-item-card rounded-xl p-2.5 mb-2">' +
                                     '<div class="task-row flex items-center justify-between">' +
                                         '<div class="flex items-center gap-2.5 min-w-0">' +
-                                            '<input type="checkbox" id="' + t.id + '" data-type="standalone" data-acc="' + t.id + '" data-app="' + key + '" class="checkbox-custom w-5 h-5 accent-emerald-500 rounded cursor-pointer flex-shrink-0">' +
+                                            '<input type="checkbox" id="' + t.id + '" data-type="standalone" data-acc="' + t.id + '" data-app="' + key + '" data-daily="' + (t.dailyReward || '') + '" class="checkbox-custom w-5 h-5 accent-emerald-500 rounded cursor-pointer flex-shrink-0">' +
                                             '<label for="' + t.id + '" class="task-label text-slate-200 cursor-pointer select-none truncate">' + t.name + '</label>' +
                                         '</div>' +
                                         '<button class="toggle-btn btn-view-tracker flex-shrink-0 ml-2" data-target="' + t.id + '_stats" title="Toggle Tracker">' +
                                             '<i class="fa-solid fa-chart-line"></i>' +
                                         '</button>' +
                                     '</div>' +
-                                    createTrackerBadgeHtml(t.id, key) +
+                                    createTrackerBadgeHtml(t.id, key, t.dailyReward) +
                                 '</div>';
                             });
                         }
@@ -1082,6 +1096,7 @@
         }
 
         function processCheckboxChange(checkboxElem, type, prefix) {
+            let customDaily = checkboxElem.getAttribute('data-daily') ? parseFloat(checkboxElem.getAttribute('data-daily')) : undefined;
             if (type === 'master') {
                 const live = document.getElementById(prefix + '_live');
                 const party = document.getElementById(prefix + '_party');
@@ -1089,7 +1104,7 @@
                     live.checked = checkboxElem.checked;
                     party.checked = checkboxElem.checked;
                 }
-                updateAccountPointsIncrement(prefix, 'poppo', checkboxElem.checked);
+                updateAccountPointsIncrement(prefix, 'poppo', checkboxElem.checked, customDaily);
             } else if (type === 'sub') {
                 const master = document.getElementById(prefix + '_master');
                 const live = document.getElementById(prefix + '_live');
@@ -1098,14 +1113,15 @@
                     const bothChecked = (live.checked && party.checked);
                     if (master.checked !== bothChecked) {
                         master.checked = bothChecked;
-                        updateAccountPointsIncrement(prefix, 'poppo', bothChecked);
+                        let masterDaily = master.getAttribute('data-daily') ? parseFloat(master.getAttribute('data-daily')) : undefined;
+                        updateAccountPointsIncrement(prefix, 'poppo', bothChecked, masterDaily);
                     }
                 }
             } else if (type === 'standalone') {
                 const accId = checkboxElem.getAttribute('data-acc');
                 const appType = checkboxElem.getAttribute('data-app');
                 if (accId && appType) {
-                    updateAccountPointsIncrement(accId, appType, checkboxElem.checked);
+                    updateAccountPointsIncrement(accId, appType, checkboxElem.checked, customDaily);
                 }
             }
             syncProgressToFirebase();
@@ -1274,8 +1290,20 @@
                             Object.keys(data).forEach(accId => {
                                 localStorage.setItem(accId + '_earned_points', data[accId]);
                                 let appType = 'desdes';
-                                if (accId.includes('poppo')) appType = 'poppo';
-                                refreshSingleTrackerUI(accId, appType);
+                                let dailyRew = undefined;
+                                devicesData.forEach(d => {
+                                    Object.keys(d).forEach(key => {
+                                        if (key !== 'id' && key !== 'name' && key !== 'color' && Array.isArray(d[key])) {
+                                            d[key].forEach(acc => {
+                                                if (acc.id === accId) {
+                                                    appType = key;
+                                                    dailyRew = acc.dailyReward;
+                                                }
+                                            });
+                                        }
+                                    });
+                                });
+                                refreshSingleTrackerUI(accId, appType, dailyRew);
                             });
                         }
                     });
