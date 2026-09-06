@@ -1,64 +1,98 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <!-- የጀርባ ድምቀት (Gradient) -->
+    <!-- Background Gradient (Rich Purple) -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="0%" stop-color="#4c1d95" />
+      <stop offset="50%" stop-color="#581c87" />
+      <stop offset="100%" stop-color="#3b0764" />
+    </linearGradient>
+
+    <!-- Phone Frame Gradient -->
+    <linearGradient id="phoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#312e81" />
       <stop offset="100%" stop-color="#1e1b4b" />
     </linearGradient>
 
-    <!-- የቴክኖሎጂ መስመሮች እና የፊደል ብርሃን (Neon/Tech Gradient) -->
-    <linearGradient id="techGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#38bdf8" />
-      <stop offset="50%" stop-color="#818cf8" />
-      <stop offset="100%" stop-color="#c084fc" />
+    <!-- Accent Gradient (Amber to Emerald) -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#10b981" />
     </linearGradient>
 
-    <!-- የብርሃን ተፅዕኖ (Glow Effect) -->
+    <!-- Text Glow & Color Gradient -->
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#34d399" />
+    </linearGradient>
+
+    <!-- Screen Glow Effect -->
     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="12" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  <!-- 1. የጀርባ ቅርጽ (Rounded App Icon Background) -->
+  <!-- App Icon Base Background -->
   <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
 
-  <!-- 2. የቴክኖሎጂ ሰርክዩት መስመሮች (Circuit Pattern Background) -->
-  <g opacity="0.25" stroke="url(#techGrad)" stroke-width="3" fill="none" stroke-linecap="round">
-    <path d="M 80 120 H 160 L 210 170" />
-    <circle cx="80" cy="120" r="6" fill="#38bdf8" />
-    
-    <path d="M 432 160 H 350 L 300 210" />
-    <circle cx="432" cy="160" r="6" fill="#c084fc" />
-    
-    <path d="M 100 400 H 180 L 230 350" />
-    <circle cx="100" cy="400" r="6" fill="#818cf8" />
-    
-    <path d="M 410 380 H 330 L 290 340" />
-    <circle cx="410" cy="380" r="6" fill="#38bdf8" />
-  </g>
+  <!-- Outer Glow Circle -->
+  <circle cx="256" cy="256" r="180" fill="#a78bfa" opacity="0.1" filter="url(#glow)" />
 
-  <!-- 3. ዋናው የ 'D' ፊደል እና የቴክኖሎጂ ምልክት (Modern 'D' Logo) -->
+  <!-- Smartphone Body -->
+  <rect x="156" y="86" width="200" height="340" rx="36" fill="url(#phoneGrad)" stroke="#6d28d9" stroke-width="6" />
+
+  <!-- Screen Area -->
+  <rect x="174" y="108" width="164" height="296" rx="20" fill="#0f0728" />
+
+  <!-- Dynamic Island / Notch -->
+  <path d="M 220 122 L 292 122 C 298 122 300 124 300 130 C 300 136 298 138 292 138 L 220 138 C 214 138 212 136 212 130 C 212 124 214 122 220 122 Z" fill="#2e1065" />
+
+  <!-- UI Mini Stats Header Bars -->
+  <rect x="190" y="156" width="60" height="24" rx="6" fill="#2e1065" />
+  <rect x="258" y="156" width="64" height="24" rx="6" fill="#2e1065" />
+
+  <!-- Task Item 1 (Completed with Check) -->
+  <rect x="190" y="192" width="132" height="42" rx="10" fill="#2e1065" opacity="0.85" />
+  <circle cx="212" cy="213" r="8" fill="#10b981" />
+  <!-- Checkmark -->
+  <path d="M 208 213 L 211 216 L 217 209" fill="none" stroke="#0f0728" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  <rect x="232" y="209" width="64" height="8" rx="4" fill="#cbd5e1" />
+
+  <!-- Task Item 2 (In Progress) -->
+  <rect x="190" y="244" width="132" height="42" rx="10" fill="#2e1065" opacity="0.85" />
+  <circle cx="212" cy="265" r="8" fill="#f59e0b" />
+  <rect x="232" y="261" width="50" height="8" rx="4" fill="#cbd5e1" />
+
+  <!-- Task Item 3 (Pending) -->
+  <rect x="190" y="296" width="132" height="42" rx="10" fill="#2e1065" opacity="0.85" />
+  <circle cx="212" cy="317" r="8" fill="#7c3aed" />
+  <rect x="232" y="313" width="40" height="8" rx="4" fill="#a78bfa" />
+
+  <!-- Progress Bar at Bottom of Screen -->
+  <rect x="190" y="356" width="132" height="8" rx="4" fill="#2e1065" />
+  <rect x="190" y="356" width="95" height="8" rx="4" fill="url(#accentGrad)" />
+
+  <!-- Floating Multi-Device / Connection Nodes -->
   <g filter="url(#glow)">
-    <!-- የውጪው የ D ቅርጽ (Outer Shield/D Curve) -->
-    <path d="M 170 130 
-             H 270 
-             C 360 130, 400 185, 400 256 
-             C 400 327, 360 382, 270 382 
-             H 170 
-             Z" 
-          fill="none" 
-          stroke="url(#techGrad)" 
-          stroke-width="28" 
-          stroke-linejoin="round" />
+    <!-- Top-Right Node -->
+    <circle cx="390" cy="150" r="32" fill="#2e1065" stroke="#f59e0b" stroke-width="4" />
+    <path d="M 382 150 L 388 156 L 398 144" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
 
-    <!-- የውስጥ የዲጂታል ኒዩክለስ / ፕላዝማ ነጥብ (Inner Tech Core) -->
-    <circle cx="245" cy="256" r="45" fill="none" stroke="#38bdf8" stroke-width="10" stroke-dasharray="15 8" />
-    <circle cx="245" cy="256" r="18" fill="url(#techGrad)" />
+    <!-- Bottom-Left Node -->
+    <circle cx="122" cy="360" r="32" fill="#2e1065" stroke="#10b981" stroke-width="4" />
+    <!-- Coin / Points Icon inside Node -->
+    <circle cx="122" cy="360" r="14" fill="none" stroke="#10b981" stroke-width="3" />
+    <text x="122" y="367" font-family="sans-serif" font-size="16" font-weight="bold" fill="#10b981" text-anchor="middle">$</text>
   </g>
 
-  <!-- 4. የፊት ለፊት ተጨማሪ የቴክኖሎጂ ነጥቦች (Data Nodes) -->
-  <circle cx="170" cy="130" r="10" fill="#38bdf8" />
-  <circle cx="170" cy="382" r="10" fill="#c084fc" />
-  <circle cx="400" cy="256" r="10" fill="#818cf8" />
+  <!-- Connection Lines -->
+  <path d="M 336 170 Q 365 160 360 150" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6,6" opacity="0.8" />
+  <path d="M 176 340 Q 140 350 152 360" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="6,6" opacity="0.8" />
+
+  <!-- Prominent & Flashing Animated "CREATED BY AGB" Text at the Bottom -->
+  <text x="256" y="465" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="900" fill="url(#textGrad)" text-anchor="middle" letter-spacing="3" filter="url(#glow)">
+    CREATED BY AGB
+    <animate attributeName="opacity" values="0.2;1;0.2;1;0.2" dur="2s" repeatCount="indefinite" />
+    <animate attributeName="font-size" values="13;18;13;18;13" dur="2s" repeatCount="indefinite" />
+  </text>
 </svg>
