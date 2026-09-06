@@ -223,40 +223,49 @@
         }
         const auth = firebase.auth();
         const db = firebase.database();
-        const devicesRef = db.ref('appState/devices');
 
+        let devicesRef = null;
         let cachedDevices = [];
 
+        // ተጠቃሚው ሎጊን መደረጉን ማረጋገጥ እና የራሱን የውሂብ መንገድ (Path) በ uid ማዘጋጀት
         auth.onAuthStateChanged((user) => {
             if (!user) {
                 window.location.href = "index.html";
-            }
-        });
-
-        // Load devices from Firebase to populate the dropdown
-        devicesRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            const selectDevice = document.getElementById('select-device');
-            
-            selectDevice.innerHTML = '<option value="" disabled selected>Select a device</option>';
-            
-            if (data) {
-                cachedDevices = Object.values(data);
-                cachedDevices.forEach(dev => {
-                    const option = document.createElement('option');
-                    option.value = dev.id;
-                    option.textContent = dev.name;
-                    selectDevice.appendChild(option);
-                });
             } else {
-                cachedDevices = [];
+                const userId = user.uid;
+                devicesRef = db.ref('users/' + userId + '/devices');
+
+                // ከዚህ ተጠቃሚ ብቻ የራሱን ስልኮች መጫን
+                devicesRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    const selectDevice = document.getElementById('select-device');
+                    
+                    selectDevice.innerHTML = '<option value="" disabled selected>Select a device</option>';
+                    
+                    if (data) {
+                        cachedDevices = Object.values(data);
+                        cachedDevices.forEach(dev => {
+                            const option = document.createElement('option');
+                            option.value = dev.id;
+                            option.textContent = dev.name;
+                            selectDevice.appendChild(option);
+                        });
+                    } else {
+                        cachedDevices = [];
+                    }
+                });
             }
         });
 
-        // Save new device to Firebase Realtime Database
+        // አዲስ ስልክ በራሱ uid ስር ማስቀመጥ
         document.getElementById('deviceForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            if (!devicesRef) {
+                alert('User not authenticated properly!');
+                return;
+            }
+
             const phoneInput = document.getElementById('phone-name');
             const phoneName = phoneInput.value.trim();
 
@@ -293,9 +302,14 @@
             }
         });
 
-        // Save new app/account under the selected device in Firebase
+        // አፕ እና አካውንት በተመረጠው ስልክ ስር ማስቀመጥ
         document.getElementById('appForm').addEventListener('submit', function(e) {
             e.preventDefault();
+
+            if (!devicesRef) {
+                alert('User not authenticated properly!');
+                return;
+            }
 
             const deviceId = document.getElementById('select-device').value;
             const appType = document.getElementById('select-app-type').value;
