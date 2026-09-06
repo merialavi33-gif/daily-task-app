@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="am">
+<html lang="am" class="select-none">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -57,7 +57,6 @@
             }
 
             const fakeEmail = formatEmail(username);
-            setLoadingState('login-btn', true);
 
             try {
                 await signInWithEmailAndPassword(
@@ -76,7 +75,6 @@
 
             } catch (error) {
                 console.error(error);
-                setLoadingState('login-btn', false);
                 let message = "Invalid username or password. Please try again.";
                 if (error.code === "auth/user-not-found") {
                     message = "This account does not exist.";
@@ -126,7 +124,6 @@
             }
 
             const fakeEmail = formatEmail(username);
-            setLoadingState('reg-btn', true);
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(
@@ -145,7 +142,6 @@
 
             } catch (error) {
                 console.error(error);
-                setLoadingState('reg-btn', false);
                 let message = "Registration failed. Please try again.";
                 if (error.code === "auth/email-already-in-use") {
                     message = "This username is already registered.";
@@ -163,14 +159,13 @@
     <style>
         * {
             -webkit-tap-highlight-color: transparent;
-            /* ፅሁፎች ኮፒ እንዳይሆኑ የሚከለክለው ክፍል */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
         }
 
-        /* ፅሁፍ መጻፊያ ሳጥኖች ውስጥ ግን ፅሁፍ መጻፍ እንዲቻል መፍቀድ */
+        /* Allow selection inside inputs */
         input {
             -webkit-user-select: text;
             -moz-user-select: text;
@@ -220,24 +215,19 @@
             outline: none;
         }
 
-        /* የደብዛዛ አረንጓዴ (Soft Green / Glass Green) በተን አቀማመጥ እና አኒሜሽን */
-        .btn-soft-green {
-            background-color: rgba(0, 191, 140, 0.15) !important;
-            border: 1px solid rgba(0, 191, 140, 0.3) !important;
-            color: #34d399 !important;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Dynamic Submit Button State Classes */
+        .btn-inactive {
+            background-color: rgba(0, 191, 140, 0.3) !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            pointer-events: none;
+            box-shadow: none !important;
         }
 
-        .btn-soft-green:hover {
-            background-color: rgba(0, 191, 140, 0.25) !important;
-            border-color: rgba(0, 191, 140, 0.5) !important;
-            box-shadow: 0 0 20px rgba(0, 191, 140, 0.2);
-            transform: translateY(-1px);
-        }
-
-        .btn-soft-green:active {
-            transform: scale(0.97) translateY(0);
+        .btn-active {
+            background-color: #00BF8C !important;
+            color: #ffffff !important;
+            pointer-events: auto;
+            box-shadow: 0 10px 25px -5px rgba(0, 191, 140, 0.4) !important;
         }
     </style>
 </head>
@@ -251,7 +241,7 @@
             <h1 id="form-heading" class="text-lg font-extrabold tracking-tight transition-all duration-300 text-slate-100">
                 Welcome to task control
             </h1>
-            <p id="form-subheading" class="text-xs text-slate-400 font-medium mt-1">
+            <p id="form-subheading" class="text-xs text-yellow-400 font-medium mt-1">
                 Enter your username to access your account.
             </p>
         </div>
@@ -263,7 +253,7 @@
                 <label class="block text-xs font-bold text-slate-300 mb-2">
                     Username
                 </label>
-                <input type="text" id="login-username" required autocomplete="username" placeholder="Enter your username" class="w-full rounded-2xl px-4 py-3.5 text-xs text-slate-100 placeholder-slate-500">
+                <input type="text" id="login-username" oninput="validateLoginForm()" required autocomplete="username" placeholder="Enter your username" class="w-full rounded-2xl px-4 py-3.5 text-xs text-slate-100 placeholder-slate-500">
             </div>
 
             <!-- PASSWORD -->
@@ -283,7 +273,7 @@
                     </a>
                 </div>
                 <div class="relative">
-                    <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••" class="w-full rounded-2xl px-4 py-3.5 pr-12 text-xs text-slate-100 placeholder-slate-500">
+                    <input type="password" id="login-password" oninput="validateLoginForm()" required autocomplete="current-password" placeholder="••••••••" class="w-full rounded-2xl px-4 py-3.5 pr-12 text-xs text-slate-100 placeholder-slate-500">
                     <button type="button" onclick="togglePassword('login-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-white transition active:scale-90">
                         <i class="fa-solid fa-eye-slash text-xs"></i>
                     </button>
@@ -291,8 +281,8 @@
             </div>
 
             <!-- LOGIN BUTTON -->
-            <button type="submit" id="login-btn" class="w-full font-bold text-xs py-4 rounded-full transition-all duration-300 shadow-lg mt-4 btn-soft-green flex items-center justify-center gap-2">
-                <span>Sign in</span>
+            <button type="submit" id="login-btn" class="w-full btn-inactive font-bold text-xs py-4 rounded-full transition-all duration-300 transform active:scale-95 mt-4">
+                Sign in
             </button>
 
             <!-- REGISTER LINK -->
@@ -313,7 +303,7 @@
                 <label class="block text-xs font-bold text-slate-300 mb-2">
                     Username
                 </label>
-                <input type="text" id="reg-username" required autocomplete="username" pattern="[a-zA-Z0-9_]+" placeholder="Choose a username" class="w-full rounded-2xl px-4 py-3.5 text-xs text-slate-100 placeholder-slate-500">
+                <input type="text" id="reg-username" oninput="validateRegisterForm()" required autocomplete="username" pattern="[a-zA-Z0-9_]+" placeholder="Choose a username" class="w-full rounded-2xl px-4 py-3.5 text-xs text-slate-100 placeholder-slate-500">
             </div>
 
             <!-- PASSWORD -->
@@ -322,7 +312,7 @@
                     Create Password
                 </label>
                 <div class="relative">
-                    <input type="password" id="reg-password" required minlength="6" autocomplete="new-password" placeholder="••••••••" class="w-full rounded-2xl px-4 py-3.5 pr-12 text-xs text-slate-100 placeholder-slate-500">
+                    <input type="password" id="reg-password" oninput="validateRegisterForm()" required minlength="6" autocomplete="new-password" placeholder="••••••••" class="w-full rounded-2xl px-4 py-3.5 pr-12 text-xs text-slate-100 placeholder-slate-500">
                     <button type="button" onclick="togglePassword('reg-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-white transition active:scale-90">
                         <i class="fa-solid fa-eye-slash text-xs"></i>
                     </button>
@@ -330,8 +320,8 @@
             </div>
 
             <!-- REGISTER BUTTON -->
-            <button type="submit" id="reg-btn" class="w-full font-bold text-xs py-4 rounded-full transition-all duration-300 shadow-lg mt-4 btn-soft-green flex items-center justify-center gap-2">
-                <span>Register</span>
+            <button type="submit" id="reg-btn" class="w-full btn-inactive font-bold text-xs py-4 rounded-full transition-all duration-300 transform active:scale-95 mt-4">
+                Register
             </button>
 
             <!-- LOGIN LINK -->
@@ -349,7 +339,7 @@
     <!-- ============================== FOOTER =============================== -->
     <footer class="w-full max-w-md mx-auto text-center py-3">
         <p class="text-[11px] font-bold tracking-wider text-slate-400">
-            created by Agb
+            created by Agb © 2026
         </p>
     </footer>
 
@@ -365,7 +355,7 @@
             <p id="auth-modal-msg" class="text-xs font-medium mb-6 text-slate-300">
                 Message goes here
             </p>
-            <button onclick="closeAuthModal()" class="w-full text-white font-bold text-xs py-3.5 rounded-full transition-all duration-200 shadow-lg btn-soft-green">
+            <button onclick="closeAuthModal()" class="w-full text-white hover:opacity-90 active:scale-[0.98] font-bold text-xs py-3.5 rounded-full transition-all duration-200 shadow-lg" style="background-color: #00BF8C;">
                 OK
             </button>
         </div>
@@ -384,6 +374,8 @@
                 registerForm.classList.add("hidden");
                 heading.innerText = "Welcome to task control";
                 subheading.innerText = "Enter your username to access your account.";
+                subheading.className = "text-xs text-yellow-400 font-medium mt-1";
+                validateLoginForm();
             }
 
             if (tab === "register") {
@@ -391,6 +383,38 @@
                 registerForm.classList.remove("hidden");
                 heading.innerText = "Create Account";
                 subheading.innerText = "Set up your username and password";
+                subheading.className = "text-xs text-yellow-400 font-medium mt-1";
+                validateRegisterForm();
+            }
+        }
+
+        function validateLoginForm() {
+            const user = document.getElementById("login-username").value.trim();
+            const pass = document.getElementById("login-password").value;
+            const btn = document.getElementById("login-btn");
+
+            // Require at least 3 characters for username and 6 characters for password
+            if (user.length >= 3 && pass.length >= 6) {
+                btn.classList.remove("btn-inactive");
+                btn.classList.add("btn-active");
+            } else {
+                btn.classList.remove("btn-active");
+                btn.classList.add("btn-inactive");
+            }
+        }
+
+        function validateRegisterForm() {
+            const user = document.getElementById("reg-username").value.trim();
+            const pass = document.getElementById("reg-password").value;
+            const btn = document.getElementById("reg-btn");
+
+            // Require at least 3 characters for username and 6 characters for password
+            if (user.length >= 3 && pass.length >= 6) {
+                btn.classList.remove("btn-inactive");
+                btn.classList.add("btn-active");
+            } else {
+                btn.classList.remove("btn-active");
+                btn.classList.add("btn-inactive");
             }
         }
 
@@ -417,21 +441,10 @@
             document.getElementById("auth-modal").classList.add("hidden");
         }
 
-        // ሲከፈት ወይም ሲመዘገብ በተኑ ላይ ሎዲንግ አኒሜሽን ለማሳየት
-        function setLoadingState(btnId, isLoading) {
-            const btn = document.getElementById(btnId);
-            if (isLoading) {
-                btn.disabled = true;
-                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-sm"></i> <span>Please wait...</span>`;
-            } else {
-                btn.disabled = false;
-                if (btnId === 'login-btn') {
-                    btn.innerHTML = `<span>Sign in</span>`;
-                } else {
-                    btn.innerHTML = `<span>Register</span>`;
-                }
-            }
-        }
+        // Initialize button states on load
+        window.addEventListener("DOMContentLoaded", () => {
+            validateLoginForm();
+        });
     </script>
 </body>
 </html>
