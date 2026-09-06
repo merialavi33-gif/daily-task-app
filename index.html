@@ -57,6 +57,7 @@
             }
 
             const fakeEmail = formatEmail(username);
+            setLoadingState('login-btn', true);
 
             try {
                 await signInWithEmailAndPassword(
@@ -75,6 +76,7 @@
 
             } catch (error) {
                 console.error(error);
+                setLoadingState('login-btn', false);
                 let message = "Invalid username or password. Please try again.";
                 if (error.code === "auth/user-not-found") {
                     message = "This account does not exist.";
@@ -124,6 +126,7 @@
             }
 
             const fakeEmail = formatEmail(username);
+            setLoadingState('reg-btn', true);
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(
@@ -142,6 +145,7 @@
 
             } catch (error) {
                 console.error(error);
+                setLoadingState('reg-btn', false);
                 let message = "Registration failed. Please try again.";
                 if (error.code === "auth/email-already-in-use") {
                     message = "This username is already registered.";
@@ -159,7 +163,21 @@
     <style>
         * {
             -webkit-tap-highlight-color: transparent;
+            /* ፅሁፎች ኮፒ እንዳይሆኑ የሚከለክለው ክፍል */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
+
+        /* ፅሁፍ መጻፊያ ሳጥኖች ውስጥ ግን ፅሁፍ መጻፍ እንዲቻል መፍቀድ */
+        input {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
         body {
             font-family: system-ui, -apple-system, sans-serif;
             background: #0f172a !important;
@@ -200,6 +218,26 @@
             border-color: #00BF8C !important;
             box-shadow: 0 0 0 2px rgba(0, 191, 140, 0.2);
             outline: none;
+        }
+
+        /* የደብዛዛ አረንጓዴ (Soft Green / Glass Green) በተን አቀማመጥ እና አኒሜሽን */
+        .btn-soft-green {
+            background-color: rgba(0, 191, 140, 0.15) !important;
+            border: 1px solid rgba(0, 191, 140, 0.3) !important;
+            color: #34d399 !important;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-soft-green:hover {
+            background-color: rgba(0, 191, 140, 0.25) !important;
+            border-color: rgba(0, 191, 140, 0.5) !important;
+            box-shadow: 0 0 20px rgba(0, 191, 140, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-soft-green:active {
+            transform: scale(0.97) translateY(0);
         }
     </style>
 </head>
@@ -253,8 +291,8 @@
             </div>
 
             <!-- LOGIN BUTTON -->
-            <button type="submit" class="w-full hover:opacity-90 active:scale-[0.98] text-white font-bold text-xs py-4 rounded-full transition-all duration-200 shadow-lg mt-4" style="background-color: #00BF8C;">
-                Sign in
+            <button type="submit" id="login-btn" class="w-full font-bold text-xs py-4 rounded-full transition-all duration-300 shadow-lg mt-4 btn-soft-green flex items-center justify-center gap-2">
+                <span>Sign in</span>
             </button>
 
             <!-- REGISTER LINK -->
@@ -292,8 +330,8 @@
             </div>
 
             <!-- REGISTER BUTTON -->
-            <button type="submit" class="w-full hover:opacity-90 active:scale-[0.98] text-white font-bold text-xs py-4 rounded-full transition-all duration-200 shadow-lg mt-4" style="background-color: #00BF8C;">
-                Register & Enter App
+            <button type="submit" id="reg-btn" class="w-full font-bold text-xs py-4 rounded-full transition-all duration-300 shadow-lg mt-4 btn-soft-green flex items-center justify-center gap-2">
+                <span>Register</span>
             </button>
 
             <!-- LOGIN LINK -->
@@ -311,7 +349,7 @@
     <!-- ============================== FOOTER =============================== -->
     <footer class="w-full max-w-md mx-auto text-center py-3">
         <p class="text-[11px] font-bold tracking-wider text-slate-400">
-            Device & Task Controller Suite © 2026
+            created by Agb
         </p>
     </footer>
 
@@ -327,7 +365,7 @@
             <p id="auth-modal-msg" class="text-xs font-medium mb-6 text-slate-300">
                 Message goes here
             </p>
-            <button onclick="closeAuthModal()" class="w-full text-white hover:opacity-90 active:scale-[0.98] font-bold text-xs py-3.5 rounded-full transition-all duration-200 shadow-lg" style="background-color: #00BF8C;">
+            <button onclick="closeAuthModal()" class="w-full text-white font-bold text-xs py-3.5 rounded-full transition-all duration-200 shadow-lg btn-soft-green">
                 OK
             </button>
         </div>
@@ -377,6 +415,22 @@
 
         function closeAuthModal() {
             document.getElementById("auth-modal").classList.add("hidden");
+        }
+
+        // ሲከፈት ወይም ሲመዘገብ በተኑ ላይ ሎዲንግ አኒሜሽን ለማሳየት
+        function setLoadingState(btnId, isLoading) {
+            const btn = document.getElementById(btnId);
+            if (isLoading) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-sm"></i> <span>Please wait...</span>`;
+            } else {
+                btn.disabled = false;
+                if (btnId === 'login-btn') {
+                    btn.innerHTML = `<span>Sign in</span>`;
+                } else {
+                    btn.innerHTML = `<span>Register</span>`;
+                }
+            }
         }
     </script>
 </body>
