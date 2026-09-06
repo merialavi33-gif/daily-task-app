@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- የጀርባ ድምቀት (Gradient) -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e1b4b" />
+    </linearGradient>
+
+    <!-- የቴክኖሎጂ መስመሮች እና የፊደል ብርሃን (Neon/Tech Gradient) -->
+    <linearGradient id="techGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#c084fc" />
+    </linearGradient>
+
+    <!-- የብርሃን ተፅዕኖ (Glow Effect) -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- 1. የጀርባ ቅርጽ (Rounded App Icon Background) -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- 2. የቴክኖሎጂ ሰርክዩት መስመሮች (Circuit Pattern Background) -->
+  <g opacity="0.25" stroke="url(#techGrad)" stroke-width="3" fill="none" stroke-linecap="round">
+    <path d="M 80 120 H 160 L 210 170" />
+    <circle cx="80" cy="120" r="6" fill="#38bdf8" />
+    
+    <path d="M 432 160 H 350 L 300 210" />
+    <circle cx="432" cy="160" r="6" fill="#c084fc" />
+    
+    <path d="M 100 400 H 180 L 230 350" />
+    <circle cx="100" cy="400" r="6" fill="#818cf8" />
+    
+    <path d="M 410 380 H 330 L 290 340" />
+    <circle cx="410" cy="380" r="6" fill="#38bdf8" />
+  </g>
+
+  <!-- 3. ዋናው የ 'D' ፊደል እና የቴክኖሎጂ ምልክት (Modern 'D' Logo) -->
+  <g filter="url(#glow)">
+    <!-- የውጪው የ D ቅርጽ (Outer Shield/D Curve) -->
+    <path d="M 170 130 
+             H 270 
+             C 360 130, 400 185, 400 256 
+             C 400 327, 360 382, 270 382 
+             H 170 
+             Z" 
+          fill="none" 
+          stroke="url(#techGrad)" 
+          stroke-width="28" 
+          stroke-linejoin="round" />
+
+    <!-- የውስጥ የዲጂታል ኒዩክለስ / ፕላዝማ ነጥብ (Inner Tech Core) -->
+    <circle cx="245" cy="256" r="45" fill="none" stroke="#38bdf8" stroke-width="10" stroke-dasharray="15 8" />
+    <circle cx="245" cy="256" r="18" fill="url(#techGrad)" />
+  </g>
+
+  <!-- 4. የፊት ለፊት ተጨማሪ የቴክኖሎጂ ነጥቦች (Data Nodes) -->
+  <circle cx="170" cy="130" r="10" fill="#38bdf8" />
+  <circle cx="170" cy="382" r="10" fill="#c084fc" />
+  <circle cx="400" cy="256" r="10" fill="#818cf8" />
+</svg>
