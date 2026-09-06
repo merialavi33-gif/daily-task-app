@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="am">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login - Device & Task Controller</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Firebase -->
+    
+    <!-- Firebase SDKs (ES Modules for Auth) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
@@ -65,15 +66,9 @@
                 );
 
                 // Save username locally
-                localStorage.setItem(
-                    "username",
-                    username
-                );
+                localStorage.setItem("username", username);
                 // Save Firebase User ID
-                localStorage.setItem(
-                    "userId",
-                    auth.currentUser.uid
-                );
+                localStorage.setItem("userId", auth.currentUser.uid);
 
                 // Go to Dashboard
                 window.location.href = "dashboard.html";
@@ -90,10 +85,7 @@
                 } else if (error.code === "auth/too-many-requests") {
                     message = "Too many attempts. Please try again later.";
                 }
-                showAlert(
-                    "Login Failed",
-                    message
-                );
+                showAlert("Login Failed", message);
             }
         };
 
@@ -142,14 +134,8 @@
                 const user = userCredential.user;
 
                 // Save user information locally
-                localStorage.setItem(
-                    "username",
-                    username
-                );
-                localStorage.setItem(
-                    "userId",
-                    user.uid
-                );
+                localStorage.setItem("username", username);
+                localStorage.setItem("userId", user.uid);
 
                 // Go to Dashboard
                 window.location.href = "dashboard.html";
@@ -164,10 +150,7 @@
                 } else if (error.code === "auth/weak-password") {
                     message = "Password is too weak. Use at least 6 characters.";
                 }
-                showAlert(
-                    "Registration Error",
-                    message
-                );
+                showAlert("Registration Error", message);
             }
         };
     </script>
@@ -178,47 +161,77 @@
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0f172a !important;
+            color: #f8fafc !important;
+            min-height: 100vh;
         }
-        /* የዳሽቦርዱን ዓይነት ጥቁር የጀርባ ከለር */
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 3px; }
+
+        .unified-glass-panel {
+            background: rgba(15, 23, 42, 0.85) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+        }
+
         .custom-gradient-bg {
             background: radial-gradient(
                 circle at center,
-                #1a1a2e 0%,
-                #0f0f1a 100%
+                #1e293b 0%,
+                #0f172a 100%
             );
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            background-color: rgba(30, 41, 59, 0.7) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #f8fafc !important;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #00BF8C !important;
+            box-shadow: 0 0 0 2px rgba(0, 191, 140, 0.2);
+            outline: none;
         }
     </style>
 </head>
-<body class="custom-gradient-bg text-slate-900 min-h-screen flex flex-col justify-between p-4 relative" >
+<body class="custom-gradient-bg text-slate-100 min-h-screen flex flex-col justify-between p-4 relative">
 
     <!-- ============================== MAIN AUTH CARD =============================== -->
-    <main class="w-full max-w-lg mx-auto bg-slate-900/70 text-slate-100 rounded-[35px] shadow-2xl border border-white/10 p-8 mt-20 mb-auto backdrop-blur-sm" >
+    <main class="w-full max-w-md mx-auto unified-glass-panel rounded-[35px] p-8 mt-20 mb-auto shadow-2xl">
         
         <!-- HEADER -->
-        <div class="text-center mb-6 pb-6 border-b border-white/10" >
-            <h1 id="form-heading" class="text-xl font-extrabold tracking-tight transition-all duration-300 text-slate-100" >
+        <div class="text-center mb-6 pb-6 border-b border-white/10">
+            <h1 id="form-heading" class="text-lg font-extrabold tracking-tight transition-all duration-300 text-slate-100">
                 Welcome to task control
             </h1>
-            <p id="form-subheading" class="text-xs text-slate-300 font-medium mt-1" >
+            <p id="form-subheading" class="text-xs text-slate-400 font-medium mt-1">
                 Enter your username to access your account.
             </p>
         </div>
 
         <!-- ============================== LOGIN FORM =============================== -->
-        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4" >
+        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
             <!-- USERNAME -->
             <div>
-                <label class="block text-base font-bold text-slate-100 mb-2" >
+                <label class="block text-xs font-bold text-slate-300 mb-2">
                     Username
                 </label>
-                <input type="text" id="login-username" required autocomplete="username" placeholder="Enter your username" class="w-full bg-slate-800/60 border border-white/10 rounded-2xl px-4 py-3.5 text-base text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all duration-200 backdrop-blur-sm" >
+                <input type="text" id="login-username" required autocomplete="username" placeholder="Enter your username" class="w-full rounded-2xl px-4 py-3.5 text-xs text-slate-100 placeholder-slate-500">
             </div>
 
             <!-- PASSWORD -->
             <div>
-                <div class="flex items-center justify-between mb-2" >
-                    <label class="block text-base font-bold text-slate-100" >
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-xs font-bold text-slate-300">
                         Password
                     </label>
                     <a href="#" onclick="
@@ -227,28 +240,28 @@
                             'Password reset will be added in the next step.'
                         );
                         return false;
-                    " class="text-xs font-semibold text-emerald-400 hover:underline transition" >
+                    " class="text-[11px] font-semibold text-emerald-400 hover:underline transition">
                         Forgot password?
                     </a>
                 </div>
                 <div class="relative">
-                    <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••" class="w-full bg-slate-800/60 border border-white/10 rounded-2xl px-4 py-3.5 pr-12 text-base text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all duration-200 backdrop-blur-sm" >
-                    <button type="button" onclick="togglePassword('login-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-300 hover:text-white transition active:scale-90" >
-                        <i class="fa-solid fa-eye-slash text-sm" ></i>
+                    <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••" class="w-full rounded-2xl px-4 py-3.5 pr-12 text-xs text-slate-100 placeholder-slate-500">
+                    <button type="button" onclick="togglePassword('login-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-white transition active:scale-90">
+                        <i class="fa-solid fa-eye-slash text-xs"></i>
                     </button>
                 </div>
             </div>
 
             <!-- LOGIN BUTTON -->
-            <button type="submit" class="w-full hover:opacity-90 active:scale-[0.98] text-white font-bold text-base py-4 rounded-full transition-all duration-200 shadow-lg mt-4" style="background-color: #00BF8C;" >
+            <button type="submit" class="w-full hover:opacity-90 active:scale-[0.98] text-white font-bold text-xs py-4 rounded-full transition-all duration-200 shadow-lg mt-4" style="background-color: #00BF8C;">
                 Sign in
             </button>
 
             <!-- REGISTER LINK -->
             <div class="text-center pt-3">
-                <p class="text-base text-slate-300 font-medium" >
+                <p class="text-xs text-slate-400 font-medium">
                     Don't have an account? 
-                    <button type="button" onclick="switchTab('register')" class="text-emerald-400 font-bold hover:underline transition" >
+                    <button type="button" onclick="switchTab('register')" class="text-emerald-400 font-bold hover:underline transition">
                         Create account
                     </button>
                 </p>
@@ -256,38 +269,38 @@
         </form>
 
         <!-- ============================== REGISTER FORM =============================== -->
-        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden" >
+        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
             <!-- USERNAME -->
             <div>
-                <label class="block text-base font-bold text-slate-100 mb-2" >
+                <label class="block text-xs font-bold text-slate-300 mb-2">
                     Username
                 </label>
-                <input type="text" id="reg-username" required autocomplete="username" pattern="[a-zA-Z0-9_]+" placeholder="Choose a username" class="w-full bg-slate-800/60 border border-white/10 rounded-2xl px-4 py-3.5 text-base text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all duration-200 backdrop-blur-sm" >
+                <input type="text" id="reg-username" required autocomplete="username" pattern="[a-zA-Z0-9_]+" placeholder="Choose a username" class="w-full rounded-2xl px-4 py-3.5 text-xs text-slate-100 placeholder-slate-500">
             </div>
 
             <!-- PASSWORD -->
             <div>
-                <label class="block text-base font-bold text-slate-100 mb-2" >
+                <label class="block text-xs font-bold text-slate-300 mb-2">
                     Create Password
                 </label>
                 <div class="relative">
-                    <input type="password" id="reg-password" required minlength="6" autocomplete="new-password" placeholder="••••••••" class="w-full bg-slate-800/60 border border-white/10 rounded-2xl px-4 py-3.5 pr-12 text-base text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all duration-200 backdrop-blur-sm" >
-                    <button type="button" onclick="togglePassword('reg-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-300 hover:text-white transition active:scale-90" >
-                        <i class="fa-solid fa-eye-slash text-sm" ></i>
+                    <input type="password" id="reg-password" required minlength="6" autocomplete="new-password" placeholder="••••••••" class="w-full rounded-2xl px-4 py-3.5 pr-12 text-xs text-slate-100 placeholder-slate-500">
+                    <button type="button" onclick="togglePassword('reg-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-white transition active:scale-90">
+                        <i class="fa-solid fa-eye-slash text-xs"></i>
                     </button>
                 </div>
             </div>
 
             <!-- REGISTER BUTTON -->
-            <button type="submit" class="w-full hover:opacity-90 active:scale-[0.98] text-white font-bold text-base py-4 rounded-full transition-all duration-200 shadow-lg mt-4" style="background-color: #00BF8C;" >
+            <button type="submit" class="w-full hover:opacity-90 active:scale-[0.98] text-white font-bold text-xs py-4 rounded-full transition-all duration-200 shadow-lg mt-4" style="background-color: #00BF8C;">
                 Register & Enter App
             </button>
 
             <!-- LOGIN LINK -->
             <div class="text-center pt-3">
-                <p class="text-base text-slate-300 font-medium" >
+                <p class="text-xs text-slate-400 font-medium">
                     Already have an account? 
-                    <button type="button" onclick="switchTab('login')" class="text-emerald-400 font-bold hover:underline transition" >
+                    <button type="button" onclick="switchTab('login')" class="text-emerald-400 font-bold hover:underline transition">
                         Sign in
                     </button>
                 </p>
@@ -296,25 +309,25 @@
     </main>
 
     <!-- ============================== FOOTER =============================== -->
-    <footer class="w-full max-w-lg mx-auto text-center py-3" >
-        <p class="text-xs font-black tracking-wider text-slate-300" >
+    <footer class="w-full max-w-md mx-auto text-center py-3">
+        <p class="text-[11px] font-bold tracking-wider text-slate-400">
             Device & Task Controller Suite © 2026
         </p>
     </footer>
 
     <!-- ============================== ALERT MODAL =============================== -->
-    <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden z-50 transition-opacity" >
-        <div class="w-full max-w-sm bg-slate-950/95 border border-white/15 rounded-[35px] p-8 text-center shadow-2xl text-slate-100" >
-            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4 text-emerald-400 shadow-lg" >
-                <i class="fa-solid fa-triangle-exclamation text-base" ></i>
+    <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden z-50 transition-opacity">
+        <div class="w-full max-w-sm unified-glass-panel rounded-[35px] p-8 text-center shadow-2xl text-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4 text-emerald-400 shadow-lg">
+                <i class="fa-solid fa-triangle-exclamation text-base"></i>
             </div>
-            <h3 id="auth-modal-title" class="text-base font-extrabold mb-2" >
+            <h3 id="auth-modal-title" class="text-sm font-extrabold mb-2">
                 Notice
             </h3>
-            <p id="auth-modal-msg" class="text-base font-medium mb-6 text-slate-300" >
+            <p id="auth-modal-msg" class="text-xs font-medium mb-6 text-slate-300">
                 Message goes here
             </p>
-            <button onclick="closeAuthModal()" class="w-full text-white hover:opacity-90 active:scale-[0.98] font-bold text-base py-4 rounded-full transition-all duration-200 shadow-lg" style="background-color: #00BF8C;" >
+            <button onclick="closeAuthModal()" class="w-full text-white hover:opacity-90 active:scale-[0.98] font-bold text-xs py-3.5 rounded-full transition-all duration-200 shadow-lg" style="background-color: #00BF8C;">
                 OK
             </button>
         </div>
@@ -322,9 +335,6 @@
 
     <!-- ============================== PAGE JAVASCRIPT =============================== -->
     <script>
-        // ==============================
-        // SWITCH LOGIN / REGISTER
-        // ==============================
         function switchTab(tab) {
             const loginForm = document.getElementById("form-login");
             const registerForm = document.getElementById("form-register");
@@ -346,34 +356,25 @@
             }
         }
 
-        // ==============================
-        // SHOW / HIDE PASSWORD
-        // ==============================
         function togglePassword(fieldId, btn) {
             const input = document.getElementById(fieldId);
             const icon = btn.querySelector("i");
 
             if (input.type === "password") {
                 input.type = "text";
-                icon.className = "fa-solid fa-eye text-sm";
+                icon.className = "fa-solid fa-eye text-xs";
             } else {
                 input.type = "password";
-                icon.className = "fa-solid fa-eye-slash text-sm";
+                icon.className = "fa-solid fa-eye-slash text-xs";
             }
         }
 
-        // ==============================
-        // ALERT
-        // ==============================
         function showAlert(title, message) {
             document.getElementById("auth-modal-title").innerText = title;
             document.getElementById("auth-modal-msg").innerText = message;
             document.getElementById("auth-modal").classList.remove("hidden");
         }
 
-        // ==============================
-        // CLOSE ALERT
-        // ==============================
         function closeAuthModal() {
             document.getElementById("auth-modal").classList.add("hidden");
         }
