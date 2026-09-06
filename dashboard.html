@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="am">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -215,11 +215,11 @@
             <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-3">
                 <i id="custom-modal-icon" class="fa-solid fa-triangle-exclamation text-amber-400 text-2xl"></i>
             </div>
-            <h3 id="custom-modal-title" class="text-lg font-extrabold text-slate-100 mb-2 tracking-wide">ማረጋገጫ</h3>
-            <p id="custom-modal-message" class="text-xs font-semibold text-slate-300 mb-6 leading-relaxed px-2">እርግጠኛ ኖት?</p>
+            <h3 id="custom-modal-title" class="text-lg font-extrabold text-slate-100 mb-2 tracking-wide">Confirmation</h3>
+            <p id="custom-modal-message" class="text-xs font-semibold text-slate-300 mb-6 leading-relaxed px-2">Are you sure?</p>
             <div id="custom-modal-actions" class="flex gap-3 justify-center">
-                <button id="custom-modal-cancel" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-3 px-4 rounded-xl border border-slate-700 transition active:scale-95">ይቅር</button>
-                <button id="custom-modal-confirm" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs py-3 px-4 rounded-xl transition shadow-lg active:scale-95">አዎ</button>
+                <button id="custom-modal-cancel" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-3 px-4 rounded-xl border border-slate-700 transition active:scale-95">Cancel</button>
+                <button id="custom-modal-confirm" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs py-3 px-4 rounded-xl transition shadow-lg active:scale-95">Yes</button>
             </div>
         </div>
     </div>
@@ -268,7 +268,7 @@
                     </div>
                     <div class="min-w-0">
                         <h3 class="text-sm font-bold text-slate-100 truncate">Accounts Tracker</h3>
-                        <p class="text-[10px] text-slate-400 truncate">ቀናት እና ነጥቦች መከታተያ</p>
+                        <p class="text-[10px] text-slate-400 truncate">Days and points tracker</p>
                     </div>
                 </div>
                 <button id="close-accounts-modal" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition flex-shrink-0">
@@ -299,7 +299,7 @@
         <!-- Congrats Banner -->
         <div id="congrats-banner" class="hidden bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/50 text-emerald-300 p-4 rounded-2xl text-center shadow-lg shadow-emerald-500/10">
             <h2 class="text-base font-bold flex items-center justify-center gap-2">
-                <span class="text-xl">🎉</span> እንኳን ደስ አሎት! የዛሬው ስራዎች ሙሉ በሙሉ ተጠናቀዋል!
+                <span class="text-xl">🎉</span> Congratulations! Today's tasks are fully completed!
             </h2>
         </div>
 
@@ -372,7 +372,7 @@
 
         <!-- Dynamic Devices Container -->
         <div id="devices-container" class="space-y-4">
-            <div class="text-center py-10 text-slate-500">
+            <div id="loading-spinner" class="text-center py-10 text-slate-500">
                 <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
                 <p class="text-sm">Loading devices and accounts...</p>
             </div>
@@ -402,7 +402,45 @@
         let daysRef = null;
         let devicesRef = null;
 
-        // የየአፑን ሩል ከ Setup ፔጅ በሚመጣው daily reward እና ሌሎች መረጃዎች ላይ በመመስረት በየራሳቸው ስታንዳርድ የሚያስተናግድ ፈንክሽን
+        function hideLoadingSpinner() {
+            const spinner = document.getElementById('loading-spinner');
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+        }
+
+        function displayData(data) {
+            if (data) {
+                if (Array.isArray(data)) {
+                    devicesData = data;
+                } else {
+                    devicesData = Object.values(data);
+                }
+            } else {
+                devicesData = [];
+            }
+            updatePhoneFiltersBar();
+            renderDashboard();
+        }
+
+        function loadFromFirebase() {
+            return new Promise((resolve, reject) => {
+                if (!auth.currentUser) {
+                    reject("Not authenticated");
+                    return;
+                }
+                const userId = auth.currentUser.uid;
+                db.ref('users/' + userId + '/devices').once('value')
+                    .then(snapshot => {
+                        const val = snapshot.val();
+                        resolve(val ? Object.values(val) : []);
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
+            });
+        }
+
         function getAppRule(appType, customDailyReward) {
             let capitalizedName = appType.charAt(0).toUpperCase() + appType.slice(1);
             let daily = customDailyReward !== undefined && !isNaN(customDailyReward) ? parseFloat(customDailyReward) : null;
@@ -418,12 +456,10 @@
             } else if (daily === 1000) {
                 return { daily: 1000, target: 100000, targetFormatted: "100k", maxDays: 100, name: capitalizedName, badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
             } else if (daily !== null) {
-                // ማንኛውም ሌላ የተለየ daily reward ሲኖር (ታርጌቱ በነባሪ 100k ተደርጎ በሂሳብ ይሰላል)
                 let target = 100000;
                 return { daily: daily, target: target, targetFormatted: "100k", maxDays: Math.ceil(target / daily), name: capitalizedName, badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
             }
 
-            // መረጃ ካልተገኘ በነባሪ የደስደስ ስታንዳርድ
             return {
                 daily: 10000,
                 target: 1000000,
@@ -1016,7 +1052,7 @@
                     const checkboxElem = this;
 
                     if (!checkboxElem.checked) {
-                        showCustomConfirm('ማረጋገጫ', 'ይህን ታክ ማጥፋት ይፈልጋሉ?', (confirmed) => {
+                        showCustomConfirm('Confirmation', 'Are you sure you want to uncheck this task?', (confirmed) => {
                             if (!confirmed) {
                                 checkboxElem.checked = true;
                             } else {
@@ -1066,7 +1102,7 @@
             if (menuLogoutBtn) {
                 menuLogoutBtn.addEventListener('click', () => {
                     dropdownMenu.classList.add('hidden');
-                    showCustomConfirm('Sign out', 'ከአካውንትዎ መውצאት ይፈልጋሉ?', (confirmed) => {
+                    showCustomConfirm('Sign out', 'Are you sure you want to sign out?', (confirmed) => {
                         if (confirmed) {
                             auth.signOut().then(() => {
                                 localStorage.clear();
@@ -1087,7 +1123,7 @@
             });
             
             document.getElementById('reset-btn').addEventListener('click', function() {
-                showCustomConfirm('ማረጋገጫ', 'የዛሬዎችን ቲኮች ብቻ መመለስ (Reset) ይፈልጋሉ?', (confirmed) => {
+                showCustomConfirm('Confirmation', 'Do you want to reset today ticks only?', (confirmed) => {
                     if (confirmed) {
                         autoResetTasks();
                     }
@@ -1258,15 +1294,35 @@
                     tasksRef = db.ref('users/' + userId + '/tasks');
                     daysRef = db.ref('users/' + userId + '/days');
 
+                    const localData = localStorage.getItem('devices_and_accounts');
+                    if (localData) {
+                        try {
+                            displayData(JSON.parse(localData));
+                            hideLoadingSpinner();
+                        } catch (e) {
+                            console.log("Local storage parse error", e);
+                        }
+                    }
+
+                    loadFromFirebase().then(freshData => {
+                        localStorage.setItem('devices_and_accounts', JSON.stringify(freshData));
+                        displayData(freshData);
+                        hideLoadingSpinner();
+                    }).catch(error => {
+                        console.log("Error loading fresh data", error);
+                        hideLoadingSpinner();
+                    });
+
                     devicesRef.on('value', (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
-                            devicesData = Object.values(data);
+                            const freshArray = Object.values(data);
+                            localStorage.setItem('devices_and_accounts', JSON.stringify(freshArray));
+                            displayData(freshArray);
                         } else {
-                            devicesData = [];
+                            displayData([]);
                         }
-                        updatePhoneFiltersBar();
-                        renderDashboard();
+                        hideLoadingSpinner();
                     });
 
                     tasksRef.on('value', (snapshot) => {
