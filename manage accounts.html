@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Accounts & Targets - Form</title>
+    <!-- Firebase SDKs (Compat - For Realtime Database & Auth) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #1A202C;
+            color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            background-color: #1A202C;
+            border-radius: 20px;
+            width: 360px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .modal-content {
+            padding: 20px;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #F6AD55;
+            margin: 0;
+        }
+
+        /* Clean X Close Button without circle and background effects */
+        .close-btn {
+            background: none;
+            border: none;
+            color: #E2E8F0;
+            width: 36px;
+            height: 36px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            outline: none;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: #E2E8F0;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            background-color: #2D3748;
+            border: 1px solid #4A5568;
+            border-radius: 8px;
+            color: #E2E8F0;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            border-color: #63B3ED;
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A0AEC0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        .two-cols {
+            display: flex;
+            gap: 15px;
+        }
+
+        .two-cols .form-group {
+            flex: 1;
+        }
+
+        /* Save Buttons with Smooth Click Animation */
+        .btn-save {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.15s ease, opacity 0.2s;
+        }
+
+        .btn-save:active {
+            transform: scale(0.96); /* Simple click scaling/animation */
+        }
+
+        .btn-green {
+            background-color: #48BB78;
+            color: #FFFFFF;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(90deg, #F6AD55 0%, #48BB78 100%);
+            color: #FFFFFF;
+        }
+
+        .section-title {
+            font-size: 12px;
+            color: #F6AD55;
+            font-weight: 600;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        ::placeholder {
+            color: #A0AEC0;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="modal-content">
+            
+            <div class="header-row">
+                <h2>ADD NEW DEVICE AND APP</h2>
+                <a href="profile.html" class="close-btn">×</a>
+            </div>
+
+            <form id="deviceForm">
+                <div class="form-group">
+                    <label for="phone-name">phone name</label>
+                    <input type="text" id="phone-name" placeholder="e.g. Phone Ultra" required>
+                </div>
+                <button type="submit" class="btn-save btn-green">save device</button>
+            </form>
+
+            <div class="section-title">ADD APP AND ACC.</div>
+
+            <form id="appForm">
+                <div class="form-group">
+                    <label for="select-device">Select Device</label>
+                    <select id="select-device" required>
+                        <option value="" disabled selected>Select a device</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="select-app-type">App Type</label>
+                    <select id="select-app-type" required>
+                        <option value="poppo">Poppo Live</option>
+                        <option value="desdes">desdes</option>
+                        <option value="tello">tello</option>
+                        <option value="kaya">Kaya</option>
+                        <option value="yago">Yago</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="acc-name">acc name</label>
+                    <input type="text" id="acc-name" placeholder="e.g. Poppo (AGB)" required>
+                </div>
+
+                <button type="submit" class="btn-save btn-gradient">save app & account</button>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYinVdxtvYwTjD_KKpPTpYUBlVoyknJPw",
+            authDomain: "dailytaskapp-20859.firebaseapp.com",
+            projectId: "dailytaskapp-20859",
+            storageBucket: "dailytaskapp-20859.firebasestorage.app",
+            messagingSenderId: "132633352057",
+            appId: "1:132633352057:web:81bd7b2c88efbc16e881a8",
+            databaseURL: "https://dailytaskapp-20859-default-rtdb.firebaseio.com"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.database();
+        const devicesRef = db.ref('appState/devices');
+
+        let cachedDevices = [];
+
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = "index.html";
+            }
+        });
+
+        // Load devices from Firebase to populate the dropdown
+        devicesRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            const selectDevice = document.getElementById('select-device');
+            
+            selectDevice.innerHTML = '<option value="" disabled selected>Select a device</option>';
+            
+            if (data) {
+                cachedDevices = Object.values(data);
+                cachedDevices.forEach(dev => {
+                    const option = document.createElement('option');
+                    option.value = dev.id;
+                    option.textContent = dev.name;
+                    selectDevice.appendChild(option);
+                });
+            } else {
+                cachedDevices = [];
+            }
+        });
+
+        // Save new device to Firebase Realtime Database
+        document.getElementById('deviceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const phoneInput = document.getElementById('phone-name');
+            const phoneName = phoneInput.value.trim();
+
+            if (phoneName) {
+                const deviceId = 'dev_' + Date.now();
+                const colors = [
+                    'from-blue-500 to-cyan-500', 
+                    'from-purple-500 to-indigo-500', 
+                    'from-emerald-500 to-teal-500', 
+                    'from-amber-500 to-orange-500', 
+                    'from-rose-500 to-pink-500'
+                ];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+                const newDeviceData = {
+                    id: deviceId,
+                    name: phoneName,
+                    color: randomColor,
+                    poppo: [],
+                    desdes: [],
+                    tello: [],
+                    kaya: [],
+                    yago: []
+                };
+
+                devicesRef.child(deviceId).set(newDeviceData)
+                    .then(() => {
+                        phoneInput.value = '';
+                        alert('Device saved successfully!');
+                    })
+                    .catch((error) => {
+                        alert('Error saving device: ' + error.message);
+                    });
+            }
+        });
+
+        // Save new app/account under the selected device in Firebase
+        document.getElementById('appForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const deviceId = document.getElementById('select-device').value;
+            const appType = document.getElementById('select-app-type').value;
+            const accNameInput = document.getElementById('acc-name');
+            const accName = accNameInput.value.trim();
+
+            if (!deviceId) {
+                alert('Please select a device first!');
+                return;
+            }
+
+            if (!accName) {
+                alert('Please enter an account name!');
+                return;
+            }
+
+            const targetDevice = cachedDevices.find(d => d.id === deviceId);
+            if (!targetDevice) {
+                alert('Selected device not found!');
+                return;
+            }
+
+            const itemId = 'acc_' + Date.now();
+
+            if (appType === 'poppo') {
+                if (!targetDevice.poppo) targetDevice.poppo = [];
+                targetDevice.poppo.push({
+                    id: itemId,
+                    name: accName
+                });
+            } else {
+                if (!targetDevice[appType]) targetDevice[appType] = [];
+                targetDevice[appType].push({
+                    id: itemId,
+                    name: accName
+                });
+            }
+
+            devicesRef.child(deviceId).set(targetDevice)
+                .then(() => {
+                    accNameInput.value = '';
+                    alert('App and account added successfully!');
+                })
+                .catch((error) => {
+                    alert('Error adding account: ' + error.message);
+                });
+        });
+    </script>
+
+</body>
+</html>
