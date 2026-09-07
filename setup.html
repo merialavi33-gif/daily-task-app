@@ -70,6 +70,28 @@
             background-color: #0f172a;
             color: #f8fafc;
         }
+
+        /* By default hide the content boxes */
+        .toggle-content {
+            display: none;
+        }
+
+        /* Custom Modal Background */
+        .custom-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
     </style>
 </head>
 <body class="min-h-screen pb-12 flex flex-col items-center justify-start p-4">
@@ -80,80 +102,227 @@
             <h1 class="text-sm font-extrabold text-slate-100 tracking-wide flex items-center gap-2">
                 <i class="fa-solid fa-gear text-amber-400"></i> Setup & Configuration
             </h1>
-            <!-- እዚህ ጋር ወደ dashboard.html እንዲመለስ ተደርጓል -->
             <a href="dashboard.html" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark text-sm"></i>
             </a>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="w-full max-w-md mt-16 space-y-6">
+    <!-- Main Container with professional top spacing to avoid header overlapping -->
+    <main class="w-full max-w-md mt-20 space-y-5">
 
-        <!-- Add Device Card -->
+        <!-- 1. Add Device Card -->
         <div class="unified-glass-panel rounded-3xl p-5 shadow-xl">
-            <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-mobile-screen"></i> Add New Device
-            </h2>
-            <form id="deviceForm" class="space-y-4">
-                <div>
-                    <label for="phone-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Phone Name</label>
-                    <input type="text" id="phone-name" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Phone Ultra" required>
-                </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-plus text-xs"></i> Save Device
-                </button>
-            </form>
+            <div class="flex justify-between items-center cursor-pointer" onclick="toggleSection('deviceContent', 'iconDevice')">
+                <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-mobile-screen"></i> Add New Device
+                </h2>
+                <i id="iconDevice" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
+            </div>
+            <div id="deviceContent" class="toggle-content mt-4">
+                <form id="deviceForm" class="space-y-4">
+                    <div>
+                        <label for="phone-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Phone Name</label>
+                        <input type="text" id="phone-name" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Phone Ultra" required>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus text-xs"></i> Save Device
+                    </button>
+                </form>
+            </div>
         </div>
 
-        <!-- Add App and Account Card -->
+        <!-- 2. Add App and Account Card -->
         <div class="unified-glass-panel rounded-3xl p-5 shadow-xl">
-            <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-layer-group"></i> Add App & Account
-            </h2>
-            <form id="appForm" class="space-y-4">
-                <div>
-                    <label for="select-device" class="block text-xs font-semibold text-slate-300 mb-1.5">Select Device</label>
-                    <select id="select-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
-                        <option value="" disabled selected>Select a device</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="select-app-type" class="block text-xs font-semibold text-slate-300 mb-1.5">App Type</label>
-                    <input type="text" id="select-app-type" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Poppo or desdes" required>
-                </div>
-
-                <div>
-                    <label for="acc-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Account Name</label>
-                    <input type="text" id="acc-name" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Poppo (AGB)" required>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
+            <div class="flex justify-between items-center cursor-pointer" onclick="toggleSection('appContent', 'iconApp')">
+                <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group"></i> Add App & Account
+                </h2>
+                <i id="iconApp" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
+            </div>
+            <div id="appContent" class="toggle-content mt-4">
+                <form id="appForm" class="space-y-4">
                     <div>
-                        <label for="daily-reward" class="block text-xs font-semibold text-slate-300 mb-1.5">Daily Reward</label>
-                        <input type="number" id="daily-reward" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. 2800" required>
-                    </div>
-                    <div>
-                        <label for="total-target" class="block text-xs font-semibold text-slate-300 mb-1.5">Total Target</label>
-                        <select id="total-target" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
-                            <option value="" disabled selected>Select target</option>
-                            <option value="100k">100k</option>
-                            <option value="1m">1m</option>
+                        <label for="select-device" class="block text-xs font-semibold text-slate-300 mb-1.5">Select Device</label>
+                        <select id="select-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                            <option value="" disabled selected>Select a device</option>
                         </select>
                     </div>
-                </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-600 hover:to-emerald-600 text-slate-950 font-extrabold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
-                    <i class="fa-solid fa-floppy-disk text-xs"></i> Save Account
-                </button>
-            </form>
+                    <div>
+                        <label for="select-app-type" class="block text-xs font-semibold text-slate-300 mb-1.5">App Type</label>
+                        <input type="text" id="select-app-type" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Poppo or desdes" required>
+                    </div>
+
+                    <div>
+                        <label for="acc-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Account Name</label>
+                        <input type="text" id="acc-name" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Poppo (AGB)" required>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="daily-reward" class="block text-xs font-semibold text-slate-300 mb-1.5">Daily Reward</label>
+                            <input type="number" id="daily-reward" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. 2800" required>
+                        </div>
+                        <div>
+                            <label for="total-target" class="block text-xs font-semibold text-slate-300 mb-1.5">Total Target</label>
+                            <select id="total-target" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                                <option value="" disabled selected>Select target</option>
+                                <option value="100k">100k</option>
+                                <option value="1m">1m</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-600 hover:to-emerald-600 text-slate-950 font-extrabold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
+                        <i class="fa-solid fa-floppy-disk text-xs"></i> Save Account
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 3. Delete Phone Card -->
+        <div class="unified-glass-panel rounded-3xl p-5 shadow-xl border-rose-500/30">
+            <div class="flex justify-between items-center cursor-pointer" onclick="toggleSensitiveSection('deletePhoneContent', 'iconDeletePhone')">
+                <h2 class="text-xs font-bold text-rose-500 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-trash-can"></i> Delete Phone
+                </h2>
+                <i id="iconDeletePhone" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
+            </div>
+            <div id="deletePhoneContent" class="toggle-content mt-4">
+                <form id="deletePhoneForm" class="space-y-4">
+                    <div>
+                        <label for="delete-select-device" class="block text-xs font-semibold text-slate-300 mb-1.5">Select Device to Delete</label>
+                        <select id="delete-select-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                            <option value="" disabled selected>Select a device</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-700 hover:to-red-800 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-rose-600/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
+                        <i class="fa-solid fa-trash text-xs"></i> Delete Device
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 4. Delete App and Account Card -->
+        <div class="unified-glass-panel rounded-3xl p-5 shadow-xl border-orange-500/30">
+            <div class="flex justify-between items-center cursor-pointer" onclick="toggleSensitiveSection('deleteAppContent', 'iconDeleteApp')">
+                <h2 class="text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-rectangle-xmark"></i> Delete App & Account
+                </h2>
+                <i id="iconDeleteApp" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
+            </div>
+            <div id="deleteAppContent" class="toggle-content mt-4">
+                <form id="deleteAppForm" class="space-y-4">
+                    <div>
+                        <label for="delete-app-device" class="block text-xs font-semibold text-slate-300 mb-1.5">Select Device</label>
+                        <select id="delete-app-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                            <option value="" disabled selected>Select a device</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="delete-app-type" class="block text-xs font-semibold text-slate-300 mb-1.5">App Type</label>
+                        <select id="delete-app-type" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                            <option value="" disabled selected>Select app type first</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="delete-acc-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Account Name</label>
+                        <select id="delete-acc-name" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                            <option value="" disabled selected>Select account first</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-orange-600 to-amber-700 hover:from-orange-700 hover:to-amber-800 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-orange-600/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
+                        <i class="fa-solid fa-trash-can text-xs"></i> Delete Account
+                    </button>
+                </form>
+            </div>
         </div>
 
     </main>
 
+    <!-- Custom Warning Modal Box -->
+    <div id="customWarningModal" class="custom-modal-backdrop">
+        <div class="unified-glass-panel rounded-3xl p-6 w-full max-w-xs text-center shadow-2xl border border-slate-700 animate-in fade-in zoom-in duration-200">
+            <!-- Warning Icon Box -->
+            <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl shadow-inner">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-100 tracking-wide mb-1.5">Confirmation</h3>
+            <p id="customWarningText" class="text-xs text-slate-400 mb-6 leading-relaxed">Do you want to proceed with this action?</p>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button" id="modalCancelBtn" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition active:scale-95 border border-slate-700">
+                    Cancel
+                </button>
+                <button type="button" id="modalYesBtn" class="py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs transition active:scale-95 shadow-lg shadow-amber-500/20">
+                    Yes
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Script Logic -->
     <script>
+        // Toggle Functions for Sections
+        function toggleSection(contentId, iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
+            
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                icon.className = 'fa-solid fa-chevron-down text-slate-400 text-xs transition';
+            } else {
+                content.style.display = 'block';
+                icon.className = 'fa-solid fa-chevron-up text-amber-400 text-xs transition';
+            }
+        }
+
+        // Sensitive Toggle with Custom Modal Warning for Deletion Sections
+        function toggleSensitiveSection(contentId, iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
+
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                icon.className = 'fa-solid fa-chevron-down text-slate-400 text-xs transition';
+            } else {
+                showCustomModal("Are you sure you want to open this sensitive deletion section?", () => {
+                    content.style.display = 'block';
+                    icon.className = 'fa-solid fa-chevron-up text-rose-500 text-xs transition';
+                });
+            }
+        }
+
+        function showCustomModal(message, onConfirm) {
+            const modal = document.getElementById('customWarningModal');
+            const textElem = document.getElementById('customWarningText');
+            const yesBtn = document.getElementById('modalYesBtn');
+            const cancelBtn = document.getElementById('modalCancelBtn');
+
+            textElem.textContent = message;
+            modal.style.display = 'flex';
+
+            // Clean previous event listeners by cloning
+            const newYesBtn = yesBtn.cloneNode(true);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+            document.getElementById('modalYesBtn').addEventListener('click', () => {
+                modal.style.display = 'none';
+                if (onConfirm) onConfirm();
+            });
+
+            document.getElementById('modalCancelBtn').addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyBYinVdxtvYwTjD_KKpPTpYUBlVoyknJPw",
             authDomain: "dailytaskapp-20859.firebaseapp.com",
@@ -182,16 +351,30 @@
                 devicesRef.on('value', (snapshot) => {
                     const data = snapshot.val();
                     const selectDevice = document.getElementById('select-device');
+                    const deleteSelectDevice = document.getElementById('delete-select-device');
+                    const deleteAppDevice = document.getElementById('delete-app-device');
                     
                     selectDevice.innerHTML = '<option value="" disabled selected>Select a device</option>';
+                    deleteSelectDevice.innerHTML = '<option value="" disabled selected>Select a device to delete</option>';
+                    deleteAppDevice.innerHTML = '<option value="" disabled selected>Select a device</option>';
                     
                     if (data) {
                         cachedDevices = Object.values(data);
                         cachedDevices.forEach(dev => {
-                            const option = document.createElement('option');
-                            option.value = dev.id;
-                            option.textContent = dev.name;
-                            selectDevice.appendChild(option);
+                            const option1 = document.createElement('option');
+                            option1.value = dev.id;
+                            option1.textContent = dev.name;
+                            selectDevice.appendChild(option1);
+
+                            const option2 = document.createElement('option');
+                            option2.value = dev.id;
+                            option2.textContent = dev.name;
+                            deleteSelectDevice.appendChild(option2);
+
+                            const option3 = document.createElement('option');
+                            option3.value = dev.id;
+                            option3.textContent = dev.name;
+                            deleteAppDevice.appendChild(option3);
                         });
                     } else {
                         cachedDevices = [];
@@ -200,22 +383,20 @@
             }
         });
 
-        // አዲስ መሳሪያ (Device) ማስቀመጥ
+        // ----------------- 1. ADD DEVICE (With Confirmation Modal) -----------------
         document.getElementById('deviceForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             if (!devicesRef) return;
-
             const phoneInput = document.getElementById('phone-name');
             const phoneName = phoneInput.value.trim();
 
-            if (phoneName) {
+            if (!phoneName) return;
+
+            showCustomModal(`Save new device "${phoneName}"?`, () => {
                 const deviceId = 'dev_' + Date.now();
                 const colors = [
-                    'from-blue-500 to-cyan-500', 
-                    'from-purple-500 to-indigo-500', 
-                    'from-emerald-500 to-teal-500', 
-                    'from-amber-500 to-orange-500', 
+                    'from-blue-500 to-cyan-500', 'from-purple-500 to-indigo-500', 
+                    'from-emerald-500 to-teal-500', 'from-amber-500 to-orange-500', 
                     'from-rose-500 to-pink-500'
                 ];
                 const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -230,79 +411,157 @@
                 devicesRef.child(deviceId).set(newDeviceData)
                     .then(() => {
                         phoneInput.value = '';
-                        window.location.href = "dashboard.html";
+                        alert('Device added successfully!');
                     })
-                    .catch((error) => {
-                        alert('Error saving device: ' + error.message);
-                    });
-            }
+                    .catch((error) => alert('Error saving device: ' + error.message));
+            });
         });
 
-        // አዲስ አፕ እና አካውንት ከመረጃዎቹ ጋር ማስቀመጥ
+        // ----------------- 2. ADD APP & ACCOUNT (With Confirmation Modal) -----------------
         document.getElementById('appForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
             if (!devicesRef) return;
 
             const deviceId = document.getElementById('select-device').value;
             const appTypeInput = document.getElementById('select-app-type');
-            const appType = appTypeInput.value.trim();
             const accNameInput = document.getElementById('acc-name');
-            const accName = accNameInput.value.trim();
             const dailyReward = document.getElementById('daily-reward').value.trim();
             const totalTarget = document.getElementById('total-target').value;
 
-            if (!deviceId) {
-                alert('Please select a device first!');
-                return;
-            }
-
-            if (!appType) {
-                alert('Please enter an app type!');
-                return;
-            }
-
-            if (!accName) {
-                alert('Please enter an account name!');
-                return;
-            }
-
-            if (!totalTarget) {
-                alert('Please select a total target!');
+            if (!deviceId || !appTypeInput.value.trim() || !accNameInput.value.trim() || !totalTarget) {
+                alert('Please fill all required fields!');
                 return;
             }
 
             const targetDevice = cachedDevices.find(d => d.id === deviceId);
-            if (!targetDevice) {
-                alert('Selected device not found!');
+            if (!targetDevice) return;
+
+            showCustomModal(`Save account "${accNameInput.value.trim()}" to "${targetDevice.name}"?`, () => {
+                const itemId = 'acc_' + Date.now();
+                const accountData = {
+                    id: itemId,
+                    appType: appTypeInput.value.trim(),
+                    name: accNameInput.value.trim(),
+                    dailyReward: dailyReward,
+                    totalTarget: totalTarget
+                };
+
+                const normalizedKey = appTypeInput.value.trim().toLowerCase().replace(/\s+/g, '_');
+                if (!targetDevice[normalizedKey]) targetDevice[normalizedKey] = [];
+                targetDevice[normalizedKey].push(accountData);
+
+                devicesRef.child(deviceId).set(targetDevice)
+                    .then(() => {
+                        appTypeInput.value = '';
+                        accNameInput.value = '';
+                        document.getElementById('daily-reward').value = '';
+                        document.getElementById('total-target').selectedIndex = 0;
+                        alert('Account added successfully!');
+                    })
+                    .catch((error) => alert('Error adding account: ' + error.message));
+            });
+        });
+
+        // ----------------- 3. DELETE PHONE -----------------
+        document.getElementById('deletePhoneForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!devicesRef) return;
+
+            const selectElement = document.getElementById('delete-select-device');
+            const deviceId = selectElement.value;
+            
+            if (!deviceId) {
+                alert('Please select a device!');
                 return;
             }
 
-            const itemId = 'acc_' + Date.now();
+            const deviceName = selectElement.options[selectElement.selectedIndex].text;
             
-            const accountData = {
-                id: itemId,
-                appType: appType,
-                name: accName,
-                dailyReward: dailyReward,
-                totalTarget: totalTarget
-            };
+            showCustomModal(`Delete "${deviceName}"? This cannot be undone!`, () => {
+                devicesRef.child(deviceId).remove()
+                    .then(() => {
+                        alert('Device deleted successfully!');
+                    })
+                    .catch((error) => {
+                        alert('Error deleting device: ' + error.message);
+                    });
+            });
+        });
 
-            const normalizedKey = appType.toLowerCase().replace(/\s+/g, '_');
-            if (!targetDevice[normalizedKey]) targetDevice[normalizedKey] = [];
-            targetDevice[normalizedKey].push(accountData);
+        // ----------------- 4. DELETE APP & ACCOUNT LOGIC -----------------
+        let selectedDeviceForAppDelete = null;
 
-            devicesRef.child(deviceId).set(targetDevice)
-                .then(() => {
-                    appTypeInput.value = '';
-                    accNameInput.value = '';
-                    document.getElementById('daily-reward').value = '';
-                    document.getElementById('total-target').selectedIndex = 0;
-                    window.location.href = "dashboard.html";
-                })
-                .catch((error) => {
-                    alert('Error adding account: ' + error.message);
+        document.getElementById('delete-app-device').addEventListener('change', function(e) {
+            const deviceId = e.target.value;
+            selectedDeviceForAppDelete = cachedDevices.find(d => d.id === deviceId);
+            
+            const appTypeSelect = document.getElementById('delete-app-type');
+            const accNameSelect = document.getElementById('delete-acc-name');
+            
+            appTypeSelect.innerHTML = '<option value="" disabled selected>Select app type</option>';
+            accNameSelect.innerHTML = '<option value="" disabled selected>Select account first</option>';
+
+            if (selectedDeviceForAppDelete) {
+                const appKeys = Object.keys(selectedDeviceForAppDelete).filter(k => !['id', 'name', 'color', 'apps'].includes(k));
+                
+                appKeys.forEach(key => {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = key.replace(/_/g, ' ').toUpperCase();
+                    appTypeSelect.appendChild(option);
                 });
+            }
+        });
+
+        document.getElementById('delete-app-type').addEventListener('change', function(e) {
+            const appKey = e.target.value;
+            const accNameSelect = document.getElementById('delete-acc-name');
+            
+            accNameSelect.innerHTML = '<option value="" disabled selected>Select account</option>';
+
+            if (selectedDeviceForAppDelete && selectedDeviceForAppDelete[appKey]) {
+                const accounts = selectedDeviceForAppDelete[appKey];
+                accounts.forEach((acc, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = acc.name;
+                    accNameSelect.appendChild(option);
+                });
+            }
+        });
+
+        document.getElementById('deleteAppForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!devicesRef || !selectedDeviceForAppDelete) return;
+
+            const appKey = document.getElementById('delete-app-type').value;
+            const accIndex = document.getElementById('delete-acc-name').value;
+
+            if (!appKey || accIndex === "") {
+                alert('Please select device, app, and account!');
+                return;
+            }
+
+            const accountToDelete = selectedDeviceForAppDelete[appKey][accIndex];
+            
+            showCustomModal(`Delete account "${accountToDelete.name}"?`, () => {
+                selectedDeviceForAppDelete[appKey].splice(accIndex, 1);
+
+                if (selectedDeviceForAppDelete[appKey].length === 0) {
+                    delete selectedDeviceForAppDelete[appKey];
+                }
+
+                devicesRef.child(selectedDeviceForAppDelete.id).set(selectedDeviceForAppDelete)
+                    .then(() => {
+                        alert('Account deleted successfully!');
+                        document.getElementById('deleteAppForm').reset();
+                        document.getElementById('delete-app-type').innerHTML = '<option value="" disabled selected>Select app type first</option>';
+                        document.getElementById('delete-acc-name').innerHTML = '<option value="" disabled selected>Select account first</option>';
+                    })
+                    .catch((error) => {
+                        alert('Error deleting account: ' + error.message);
+                    });
+            });
         });
     </script>
 </body>
