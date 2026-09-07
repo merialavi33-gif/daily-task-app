@@ -67,16 +67,15 @@
         }
 
         select option {
-            background-color: #0f172a;
-            color: #f8fafc;
+            background-color: #0b1329 !important;
+            color: #f8fafc !important;
+            padding: 12px !important;
         }
 
-        /* By default hide the content boxes */
         .toggle-content {
             display: none;
         }
 
-        /* Custom Modal Background */
         .custom-modal-backdrop {
             position: fixed;
             top: 0;
@@ -96,151 +95,154 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start p-4">
 
-    <!-- Top Navigation / Header -->
-    <header class="glass-header border-b border-slate-800 w-full max-w-md fixed top-0 z-50 px-4 py-3">
-        <div class="flex justify-between items-center">
-            <h1 class="text-sm font-extrabold text-slate-100 tracking-wide flex items-center gap-2">
+    <!-- Main Outer Unified Glass Panel (ይህ ሳጥን ሁሉንም ይዘቶች ያቀፈ ነው) -->
+    <main class="w-full max-w-md mt-6 mb-12 unified-glass-panel rounded-3xl p-5 shadow-2xl relative space-y-5">
+
+        <!-- Top Navigation / Header inside the panel -->
+        <header class="flex justify-between items-center border-b border-slate-700/60 pb-3">
+            <h1 class="text-sm font-extrabold text-white tracking-wide flex items-center gap-2">
                 <i class="fa-solid fa-gear text-amber-400"></i> Setup & Configuration
             </h1>
-            <a href="dashboard.html" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+            <a href="dashboard.html" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark text-sm"></i>
             </a>
-        </div>
-    </header>
+        </header>
 
-    <!-- Main Container adjusted with mt-24 and pb-24 to keep elements neatly spaced and prevent footer/bottom overlap -->
-    <main class="w-full max-w-md mt-24 pb-24 space-y-5">
+        <!-- Inner Content Container -->
+        <div class="space-y-4">
 
-        <!-- 1. Add Device Card -->
-        <div class="unified-glass-panel rounded-3xl p-5 shadow-xl">
-            <div class="flex justify-between items-center cursor-pointer" onclick="toggleSection('deviceContent', 'iconDevice')">
-                <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-mobile-screen"></i> Add New Device
-                </h2>
-                <i id="iconDevice" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
-            </div>
-            <div id="deviceContent" class="toggle-content mt-4">
-                <form id="deviceForm" class="space-y-4">
-                    <div>
-                        <label for="phone-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Phone Name</label>
-                        <input type="text" id="phone-name" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Phone Ultra" required>
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-plus text-xs"></i> Save Device
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- 2. Add App and Account Card -->
-        <div class="unified-glass-panel rounded-3xl p-5 shadow-xl">
-            <div class="flex justify-between items-center cursor-pointer" onclick="toggleSection('appContent', 'iconApp')">
-                <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-layer-group"></i> Add App & Account
-                </h2>
-                <i id="iconApp" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
-            </div>
-            <div id="appContent" class="toggle-content mt-4">
-                <form id="appForm" class="space-y-4">
-                    <div>
-                        <label for="select-device" class="block text-xs font-semibold text-slate-300 mb-1.5">Select Device</label>
-                        <select id="select-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
-                            <option value="" disabled selected>Select a device</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="select-app-type" class="block text-xs font-semibold text-slate-300 mb-1.5">App Type</label>
-                        <input type="text" id="select-app-type" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Poppo or desdes" required>
-                    </div>
-
-                    <div>
-                        <label for="acc-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Account Name</label>
-                        <input type="text" id="acc-name" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Poppo (AGB)" required>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
+            <!-- 1. Add Device Card (Green Border) -->
+            <div class="bg-slate-900/60 rounded-2xl p-4 shadow-md border border-emerald-500/50">
+                <div class="flex justify-between items-center cursor-pointer" onclick="toggleSection('deviceContent', 'iconDevice')">
+                    <h2 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-mobile-screen text-emerald-400"></i> Add New Device
+                    </h2>
+                    <i id="iconDevice" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
+                </div>
+                <div id="deviceContent" class="toggle-content mt-4">
+                    <form id="deviceForm" class="space-y-4">
                         <div>
-                            <label for="daily-reward" class="block text-xs font-semibold text-slate-300 mb-1.5">Daily Reward</label>
-                            <input type="number" id="daily-reward" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. 2800" required>
+                            <label for="phone-name" class="block text-xs font-semibold text-slate-200 mb-1.5">Phone Name</label>
+                            <input type="text" id="phone-name" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Phone Ultra" required>
                         </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus text-xs"></i> Save Device
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 2. Add App and Account Card (Green Border) -->
+            <div class="bg-slate-900/60 rounded-2xl p-4 shadow-md border border-emerald-500/50">
+                <div class="flex justify-between items-center cursor-pointer" onclick="toggleSection('appContent', 'iconApp')">
+                    <h2 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-emerald-400"></i> Add App & Account
+                    </h2>
+                    <i id="iconApp" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
+                </div>
+                <div id="appContent" class="toggle-content mt-4">
+                    <form id="appForm" class="space-y-4">
                         <div>
-                            <label for="total-target" class="block text-xs font-semibold text-slate-300 mb-1.5">Total Target</label>
-                            <select id="total-target" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
-                                <option value="" disabled selected>Select target</option>
-                                <option value="100k">100k</option>
-                                <option value="1m">1m</option>
+                            <label for="select-device" class="block text-xs font-semibold text-slate-200 mb-1.5">Select Device</label>
+                            <select id="select-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                                <option value="" disabled selected>Select a device</option>
                             </select>
                         </div>
-                    </div>
 
-                    <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-600 hover:to-emerald-600 text-slate-950 font-extrabold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
-                        <i class="fa-solid fa-floppy-disk text-xs"></i> Save Account
-                    </button>
-                </form>
+                        <div>
+                            <label for="select-app-type" class="block text-xs font-semibold text-slate-200 mb-1.5">App Type</label>
+                            <input type="text" id="select-app-type" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Poppo or desdes" required>
+                        </div>
+
+                        <div>
+                            <label for="acc-name" class="block text-xs font-semibold text-slate-200 mb-1.5">Account Name</label>
+                            <input type="text" id="acc-name" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. Poppo (AGB)" required>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="daily-reward" class="block text-xs font-semibold text-slate-200 mb-1.5">Daily Reward</label>
+                                <input type="number" id="daily-reward" class="w-full px-3.5 py-3 rounded-xl text-xs" placeholder="e.g. 2800" required>
+                            </div>
+                            <div>
+                                <label for="total-target" class="block text-xs font-semibold text-slate-200 mb-1.5">Total Target</label>
+                                <select id="total-target" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                                    <option value="" disabled selected>Select target</option>
+                                    <option value="100k">100k</option>
+                                    <option value="1m">1m</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
+                            <i class="fa-solid fa-floppy-disk text-xs"></i> Save Account
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <!-- 3. Delete Phone Card -->
-        <div class="unified-glass-panel rounded-3xl p-5 shadow-xl border-rose-500/30">
-            <div class="flex justify-between items-center cursor-pointer" onclick="toggleSensitiveSection('deletePhoneContent', 'iconDeletePhone')">
-                <h2 class="text-xs font-bold text-rose-500 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-trash-can"></i> Delete Phone
-                </h2>
-                <i id="iconDeletePhone" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
+            <!-- 3. Delete Phone Card (Red Border) -->
+            <div class="bg-slate-900/60 rounded-2xl p-4 shadow-md border border-rose-500/50">
+                <div class="flex justify-between items-center cursor-pointer" onclick="toggleSensitiveSection('deletePhoneContent', 'iconDeletePhone')">
+                    <h2 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-trash-can text-rose-500"></i> Delete Phone
+                    </h2>
+                    <i id="iconDeletePhone" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
+                </div>
+                <div id="deletePhoneContent" class="toggle-content mt-4">
+                    <form id="deletePhoneForm" class="space-y-4">
+                        <div>
+                            <label for="delete-select-device" class="block text-xs font-semibold text-slate-200 mb-1.5">Select Device to Delete</label>
+                            <select id="delete-select-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                                <option value="" disabled selected>Select a device</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-700 hover:to-red-800 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-rose-600/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
+                            <i class="fa-solid fa-trash text-xs"></i> Delete Device
+                        </button>
+                    </form>
+                </div>
             </div>
-            <div id="deletePhoneContent" class="toggle-content mt-4">
-                <form id="deletePhoneForm" class="space-y-4">
-                    <div>
-                        <label for="delete-select-device" class="block text-xs font-semibold text-slate-300 mb-1.5">Select Device to Delete</label>
-                        <select id="delete-select-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
-                            <option value="" disabled selected>Select a device</option>
-                        </select>
-                    </div>
 
-                    <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-700 hover:to-red-800 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-rose-600/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
-                        <i class="fa-solid fa-trash text-xs"></i> Delete Device
-                    </button>
-                </form>
+            <!-- 4. Delete App and Account Card (Red Border) -->
+            <div class="bg-slate-900/60 rounded-2xl p-4 shadow-md border border-rose-500/50">
+                <div class="flex justify-between items-center cursor-pointer" onclick="toggleSensitiveSection('deleteAppContent', 'iconDeleteApp')">
+                    <h2 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-rectangle-xmark text-rose-500"></i> Delete App & Account
+                    </h2>
+                    <i id="iconDeleteApp" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
+                </div>
+                <div id="deleteAppContent" class="toggle-content mt-4">
+                    <form id="deleteAppForm" class="space-y-4">
+                        <div>
+                            <label for="delete-app-device" class="block text-xs font-semibold text-slate-200 mb-1.5">Select Device</label>
+                            <select id="delete-app-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                                <option value="" disabled selected>Select a device</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="delete-app-type" class="block text-xs font-semibold text-slate-200 mb-1.5">App Type</label>
+                            <select id="delete-app-type" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                                <option value="" disabled selected>Select app type first</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="delete-acc-name" class="block text-xs font-semibold text-slate-200 mb-1.5">Account Name</label>
+                            <select id="delete-acc-name" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
+                                <option value="" disabled selected>Select account first</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-700 hover:to-red-800 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-rose-600/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
+                            <i class="fa-solid fa-trash-can text-xs"></i> Delete Account
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <!-- 4. Delete App and Account Card -->
-        <div class="unified-glass-panel rounded-3xl p-5 shadow-xl border-orange-500/30">
-            <div class="flex justify-between items-center cursor-pointer" onclick="toggleSensitiveSection('deleteAppContent', 'iconDeleteApp')">
-                <h2 class="text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-rectangle-xmark"></i> Delete App & Account
-                </h2>
-                <i id="iconDeleteApp" class="fa-solid fa-chevron-down text-slate-400 text-xs transition"></i>
-            </div>
-            <div id="deleteAppContent" class="toggle-content mt-4">
-                <form id="deleteAppForm" class="space-y-4">
-                    <div>
-                        <label for="delete-app-device" class="block text-xs font-semibold text-slate-300 mb-1.5">Select Device</label>
-                        <select id="delete-app-device" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
-                            <option value="" disabled selected>Select a device</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="delete-app-type" class="block text-xs font-semibold text-slate-300 mb-1.5">App Type</label>
-                        <select id="delete-app-type" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
-                            <option value="" disabled selected>Select app type first</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="delete-acc-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Account Name</label>
-                        <select id="delete-acc-name" class="w-full px-3.5 py-3 rounded-xl text-xs" required>
-                            <option value="" disabled selected>Select account first</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="w-full bg-gradient-to-r from-orange-600 to-amber-700 hover:from-orange-700 hover:to-amber-800 text-white font-bold text-xs py-3.5 px-4 rounded-xl transition shadow-lg shadow-orange-600/20 active:scale-95 flex items-center justify-center gap-2 mt-2">
-                        <i class="fa-solid fa-trash-can text-xs"></i> Delete Account
-                    </button>
-                </form>
-            </div>
         </div>
 
     </main>
@@ -248,12 +250,11 @@
     <!-- Custom Warning Modal Box -->
     <div id="customWarningModal" class="custom-modal-backdrop">
         <div class="unified-glass-panel rounded-3xl p-6 w-full max-w-xs text-center shadow-2xl border border-slate-700 animate-in fade-in zoom-in duration-200">
-            <!-- Warning Icon Box -->
             <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl shadow-inner">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h3 class="text-sm font-bold text-slate-100 tracking-wide mb-1.5">Confirmation</h3>
-            <p id="customWarningText" class="text-xs text-slate-400 mb-6 leading-relaxed">Do you want to proceed with this action?</p>
+            <h3 class="text-sm font-bold text-white tracking-wide mb-1.5">Confirmation</h3>
+            <p id="customWarningText" class="text-xs text-slate-300 mb-6 leading-relaxed">Do you want to proceed with this action?</p>
             
             <div class="grid grid-cols-2 gap-3">
                 <button type="button" id="modalCancelBtn" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition active:scale-95 border border-slate-700">
@@ -268,7 +269,6 @@
 
     <!-- Script Logic -->
     <script>
-        // Toggle Functions for Sections
         function toggleSection(contentId, iconId) {
             const content = document.getElementById(contentId);
             const icon = document.getElementById(iconId);
@@ -282,7 +282,6 @@
             }
         }
 
-        // Sensitive Toggle with Custom Modal Warning for Deletion Sections
         function toggleSensitiveSection(contentId, iconId) {
             const content = document.getElementById(contentId);
             const icon = document.getElementById(iconId);
@@ -307,7 +306,6 @@
             textElem.textContent = message;
             modal.style.display = 'flex';
 
-            // Clean previous event listeners by cloning
             const newYesBtn = yesBtn.cloneNode(true);
             const newCancelBtn = cancelBtn.cloneNode(true);
             yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
@@ -383,7 +381,6 @@
             }
         });
 
-        // ----------------- 1. ADD DEVICE (With Confirmation Modal) -----------------
         document.getElementById('deviceForm').addEventListener('submit', function(e) {
             e.preventDefault();
             if (!devicesRef) return;
@@ -417,7 +414,6 @@
             });
         });
 
-        // ----------------- 2. ADD APP & ACCOUNT (With Confirmation Modal) -----------------
         document.getElementById('appForm').addEventListener('submit', function(e) {
             e.preventDefault();
             if (!devicesRef) return;
@@ -462,7 +458,6 @@
             });
         });
 
-        // ----------------- 3. DELETE PHONE -----------------
         document.getElementById('deletePhoneForm').addEventListener('submit', function(e) {
             e.preventDefault();
             if (!devicesRef) return;
@@ -488,7 +483,6 @@
             });
         });
 
-        // ----------------- 4. DELETE APP & ACCOUNT LOGIC -----------------
         let selectedDeviceForAppDelete = null;
 
         document.getElementById('delete-app-device').addEventListener('change', function(e) {
