@@ -705,7 +705,7 @@
                         '</div>' +
                         '<div class="min-w-0">' +
                             '<div class="flex items-center gap-1.5">' +
-                                '<h4 class="text-xs font-bold text-amber-300 truncate">' + acc.name + '</h4>' +
+                                '<h4 class="text-xs font-bold text-yellow-600/90 truncate">' + acc.name + '</h4>' +
                                 '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase ' + ruleConfig.badgeColor + '">' + acc.appType + '</span>' +
                             '</div>' +
                             '<p class="text-[10px] text-slate-400 mt-0.5">Device: <span class="text-slate-300 font-semibold">' + acc.devName + '</span> | Days Done: <span class="text-amber-400 font-bold">' + acc.daysWorked + 'd</span></p>' +
@@ -941,7 +941,7 @@
                             '<div class="task-row flex items-center justify-between p-2.5 rounded-lg">' +
                                 '<div class="flex items-center gap-2.5 min-w-0">' +
                                     '<input type="checkbox" id="' + p.id + '_master" data-type="master" data-prefix="' + p.id + '" data-app="poppo" data-daily="' + (p.dailyReward || '') + '" class="checkbox-custom w-5 h-5 rounded cursor-pointer flex-shrink-0">' +
-                                    '<label for="' + p.id + '_master" class="task-label text-amber-300 font-bold cursor-pointer select-none truncate">' + p.name + '</label>' +
+                                    '<label for="' + p.id + '_master" class="task-label text-yellow-600/90 font-bold cursor-pointer select-none truncate">' + p.name + '</label>' +
                                 '</div>' +
                                 '<div class="flex items-center gap-1.5 flex-shrink-0 ml-2">' +
                                     '<button class="toggle-btn btn-view-tracker" data-target="' + p.id + '_stats" title="Toggle Tracker">' +
@@ -983,7 +983,7 @@
                                     '<div class="task-row flex items-center justify-between">' +
                                         '<div class="flex items-center gap-2.5 min-w-0">' +
                                             '<input type="checkbox" id="' + t.id + '" data-type="standalone" data-acc="' + t.id + '" data-app="' + key + '" data-daily="' + (t.dailyReward || '') + '" class="checkbox-custom w-5 h-5 rounded cursor-pointer flex-shrink-0">' +
-                                            '<label for="' + t.id + '" class="task-label text-amber-300 font-bold cursor-pointer select-none truncate">' + t.name + '</label>' +
+                                            '<label for="' + t.id + '" class="task-label text-yellow-600/90 font-bold cursor-pointer select-none truncate">' + t.name + '</label>' +
                                         '</div>' +
                                         '<button class="toggle-btn btn-view-tracker flex-shrink-0 ml-2" data-target="' + t.id + '_stats" title="Toggle Tracker">' +
                                             '<i class="fa-solid fa-chart-line"></i>' +
