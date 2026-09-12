@@ -61,11 +61,9 @@
         .sub-task-label { font-weight: 500; font-size: 0.82rem; }
         .app-header { font-weight: 700; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; }
 
-        /* Custom Soft Teal / Cyan Accent for Checkboxes - Updated to Deep/Dark Muted Green */
         .checkbox-custom { width: 1.25rem; height: 1.25rem; accent-color: #065f46; cursor: pointer; flex-shrink: 0; }
         .checkbox-custom.sub { width: 1.1rem; height: 1.1rem; accent-color: #065f46; }
         
-        /* Updated Checked Style: Deep/Dark Muted Green with Strikethrough up to Name and Strikethrough Line */
         .checkbox-custom:checked + label,
         input[type="checkbox"]:checked ~ label { 
             text-decoration: line-through; 
@@ -198,7 +196,7 @@
             color: #cbd5e1;
             font-size: 0.75rem;
             font-weight: 600;
-            padding: 8px 10px;
+            padding: 8px 6px;
             border-radius: 12px;
             transition: all 0.2s ease;
             white-space: nowrap;
@@ -207,6 +205,9 @@
             justify-content: center;
             gap: 4px;
             backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .phone-filter-btn.active {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
@@ -214,6 +215,26 @@
             border-color: #fbbf24;
             box-shadow: 0 3px 10px rgba(245, 158, 11, 0.35);
             font-weight: 700;
+        }
+
+        .phone-badge {
+            position: absolute;
+            top: 3px;
+            right: 4px;
+            background-color: #ef4444;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 0px 3px;
+            border-radius: 9999px;
+            line-height: 1.1;
+            min-width: 14px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(239, 68, 68, 0.4);
+        }
+        .phone-filter-btn.active .phone-badge {
+            background-color: #0f172a;
+            color: #f8fafc;
         }
     </style>
 </head>
@@ -368,10 +389,13 @@
         <!-- Quick Phone Filter Buttons Bar -->
         <section>
             <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-2">Phones</p>
-            <div class="grid grid-cols-4 gap-2 mb-2" id="phone-filters-row1">
-                <button class="phone-filter-btn active" data-phone="all">All</button>
-            </div>
-            <div class="grid grid-cols-3 gap-2" id="phone-filters-row2">
+            <!-- All የሚለው በተን ከሁለቱ ረድፎች አናትና ታች መካከል በትክክል ሴንተር እንዲሆን የተደረገበት ክፍል -->
+            <div class="grid grid-cols-4 gap-2 items-center">
+                <button class="phone-filter-btn active py-4" data-phone="all">All <span id="phone-badge-all" class="phone-badge">0</span></button>
+                <div class="col-span-3 grid grid-cols-3 gap-2">
+                    <div id="phone-filters-row1-col" class="contents"></div>
+                    <div id="phone-filters-row2-col" class="contents"></div>
+                </div>
             </div>
         </section>
 
@@ -1230,38 +1254,100 @@
                 if (congratsBanner) congratsBanner.classList.add('hidden');
                 celebrated = false;
             }
+
+            updatePhoneFilterBadges();
         }
 
-        function updatePhoneFiltersBar() {
-            const row1Container = document.getElementById('phone-filters-row1');
-            const row2Container = document.getElementById('phone-filters-row2');
-            if (!row1Container || !row2Container) return;
-
-            let row1Html = '<button class="phone-filter-btn ' + (currentPhoneFilter === 'all' ? 'active' : '') + '" data-phone="all">All</button>';
-            let row2Html = '';
-
-            devicesData.forEach((dev, index) => {
-                const isActive = currentPhoneFilter === dev.id ? 'active' : '';
-                const btnHtml = '<button class="phone-filter-btn ' + isActive + '" data-phone="' + dev.id + '">' + dev.name.replace('Phone ', '') + '</button>';
-                
-                if (index < 3) {
-                    row1Html += btnHtml;
-                } else {
-                    row2Html += btnHtml;
+        function updatePhoneFilterBadges() {
+            devicesData.forEach(dev => {
+                const prog = getDeviceProgress(dev.id);
+                const uncompleted = prog.total - prog.done;
+                const badgeElem = document.getElementById('phone-badge-' + dev.id);
+                if (badgeElem) {
+                    if (uncompleted > 0) {
+                        badgeElem.innerText = uncompleted;
+                        badgeElem.style.display = 'inline-block';
+                    } else {
+                        badgeElem.style.display = 'none';
+                    }
                 }
             });
 
-            row1Container.innerHTML = row1Html;
-            row2Container.innerHTML = row2Html;
+            let totalUncompletedAll = 0;
+            devicesData.forEach(dev => {
+                const prog = getDeviceProgress(dev.id);
+                totalUncompletedAll += (prog.total - prog.done);
+            });
+            const allBadgeElem = document.getElementById('phone-badge-all');
+            if (allBadgeElem) {
+                if (totalUncompletedAll > 0) {
+                    allBadgeElem.innerText = totalUncompletedAll;
+                    allBadgeElem.style.display = 'inline-block';
+                } else {
+                    allBadgeElem.style.display = 'none';
+                }
+            }
+        }
+
+        function updatePhoneFiltersBar() {
+            const row1ColContainer = document.getElementById('phone-filters-row1-col');
+            const row2ColContainer = document.getElementById('phone-filters-row2-col');
+            if (!row1ColContainer || !row2ColContainer) return;
+
+            let proDev = null, novaDev = null, ehDev = null;
+            let yabDev = null, zteDev = null, sparkDev = null;
+            let otherDevs = [];
+
+            devicesData.forEach(dev => {
+                let nameLower = dev.name.toLowerCase();
+                if (nameLower.includes('pro')) proDev = dev;
+                else if (nameLower.includes('nova')) novaDev = dev;
+                else if (nameLower.includes('eh')) ehDev = dev;
+                else if (nameLower.includes('yab')) yabDev = dev;
+                else if (nameLower.includes('zte')) zteDev = dev;
+                else if (nameLower.includes('spark')) sparkDev = dev;
+                else otherDevs.push(dev);
+            });
+
+            let topRowList = [proDev, novaDev, ehDev].filter(Boolean);
+            let bottomRowList = [yabDev, zteDev, sparkDev].filter(Boolean);
+
+            if (topRowList.length < 3) {
+                devicesData.forEach(d => {
+                    if (!topRowList.includes(d) && !bottomRowList.includes(d)) {
+                        if (topRowList.length < 3) topRowList.push(d);
+                        else bottomRowList.push(d);
+                    }
+                });
+            }
+
+            let row1Html = '';
+            topRowList.slice(0, 3).forEach(dev => {
+                const isActive = currentPhoneFilter === dev.id ? 'active' : '';
+                row1Html += '<button class="phone-filter-btn ' + isActive + '" data-phone="' + dev.id + '">' + dev.name.replace('Phone ', '') + ' <span id="phone-badge-' + dev.id + '" class="phone-badge">0</span></button>';
+            });
+
+            let row2Html = '';
+            bottomRowList.forEach(dev => {
+                const isActive = currentPhoneFilter === dev.id ? 'active' : '';
+                row2Html += '<button class="phone-filter-btn ' + isActive + '" data-phone="' + dev.id + '">' + dev.name.replace('Phone ', '') + ' <span id="phone-badge-' + dev.id + '" class="phone-badge">0</span></button>';
+            });
+
+            row1ColContainer.innerHTML = row1Html;
+            row2ColContainer.innerHTML = row2Html;
 
             document.querySelectorAll('.phone-filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
+                    const phoneId = this.getAttribute('data-phone');
+                    if (!phoneId) return;
                     document.querySelectorAll('.phone-filter-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
-                    currentPhoneFilter = this.getAttribute('data-phone');
+                    currentPhoneFilter = phoneId;
                     renderDashboard();
                 });
             });
+
+            updatePhoneFilterBadges();
         }
 
         function initFirebaseListeners() {
