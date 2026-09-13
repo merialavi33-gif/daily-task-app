@@ -185,7 +185,7 @@
         ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 3px; }
 
         .unified-glass-panel {
-            background: rgba(15, 23, 42, 0.85) !important;
+            background: rgba(15, 23, 42, 0.95) !important;
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -228,6 +228,14 @@
             color: #ffffff !important;
             pointer-events: auto;
             box-shadow: 0 10px 25px -5px rgba(0, 191, 140, 0.4) !important;
+        }
+
+        /* Ripple / Click Animation Effect */
+        .click-animation {
+            transition: transform 0.1s ease, background-color 0.2s ease;
+        }
+        .click-animation:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -361,6 +369,99 @@
         </div>
     </div>
 
+    <!-- ============================== SUBSCRIPTION MODAL =============================== -->
+    <div id="subscription-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-4 z-50">
+        <div class="w-full max-w-md unified-glass-panel rounded-[35px] p-6 text-center shadow-2xl text-slate-100 max-h-[90vh] overflow-y-auto">
+            
+            <!-- STEP 1: PLAN SELECTION -->
+            <div id="sub-step-1">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3 text-emerald-400 shadow-lg">
+                    <i class="fa-solid fa-crown text-xl"></i>
+                </div>
+                <h3 class="text-base font-extrabold mb-1">Unlock Full Access</h3>
+                <p class="text-xs text-slate-300 mb-5">Choose a subscription plan to continue using Task Controller.</p>
+                
+                <div class="space-y-3 text-left mb-6">
+                    <!-- Plan 1: Monthly (200 ብር) -->
+                    <label class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 border border-white/10 cursor-pointer hover:border-emerald-500 transition">
+                        <div class="flex items-center space-x-3">
+                            <input type="radio" name="sub_plan" value="monthly" checked class="accent-emerald-500 w-4 h-4">
+                            <div>
+                                <p class="font-bold text-xs text-slate-100">Monthly Plan</p>
+                                <p class="text-[10px] text-slate-400">Full access for 30 days</p>
+                            </div>
+                        </div>
+                        <span class="font-extrabold text-emerald-400 text-xs">200 ብር /mo</span>
+                    </label>
+                    <!-- Plan 2: Yearly (1,920 ብር) -->
+                    <label class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 border border-white/10 cursor-pointer hover:border-emerald-500 transition">
+                        <div class="flex items-center space-x-3">
+                            <input type="radio" name="sub_plan" value="yearly" class="accent-emerald-500 w-4 h-4">
+                            <div>
+                                <p class="font-bold text-xs text-slate-100">Yearly Plan <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full ml-1">Save 20%</span></p>
+                                <p class="text-[10px] text-slate-400">Full access for 12 months</p>
+                            </div>
+                        </div>
+                        <span class="font-extrabold text-emerald-400 text-xs">1,920 ብር /yr</span>
+                    </label>
+                </div>
+
+                <button onclick="goToPaymentStep()" class="w-full text-white hover:opacity-90 active:scale-[0.98] font-bold text-xs py-3.5 rounded-full transition-all duration-200 shadow-lg" style="background-color: #00BF8C;">
+                    Continue
+                </button>
+            </div>
+
+            <!-- STEP 2: PAYMENT & CODE ENTRY -->
+            <div id="sub-step-2" class="hidden text-left">
+                <div class="text-center mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-2 text-emerald-400 shadow-lg">
+                        <i class="fa-solid fa-wallet text-lg"></i>
+                    </div>
+                    <h3 class="text-sm font-extrabold">Payment & Activation</h3>
+                    <p class="text-[11px] text-slate-300">Send payment and enter your access code.</p>
+                </div>
+
+                <!-- Payment Method CBE -->
+                <div class="mb-4 bg-slate-900/80 p-3.5 rounded-2xl border border-white/10">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-slate-300">Payment Method: <span class="text-emerald-400">CBE</span></span>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-950 px-3 py-2.5 rounded-xl border border-white/5 mt-2">
+                        <span id="cbe-account" class="text-xs font-mono font-bold text-yellow-400">1000329461298</span>
+                        <button onclick="copyCbeAccount()" class="text-[11px] bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-lg hover:bg-emerald-500/30 transition flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Send Receipt Button with Fast Animation & Loading State -->
+                <div class="mb-4">
+                    <button id="telegram-btn" onclick="sendReceiptTelegram()" class="w-full click-animation flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-md">
+                        <i id="tg-icon" class="fa-brands fa-telegram text-sm"></i> 
+                        <span id="tg-text">ደረሰኝ ላክ (Send Receipt)</span>
+                    </button>
+                </div>
+
+                <!-- Add Code Box -->
+                <div class="mb-5">
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Add Code</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="access-code-input" placeholder="Enter activation code" class="w-full rounded-xl px-3 py-2.5 text-xs text-slate-100 placeholder-slate-500">
+                        <button onclick="verifyAccessCode()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-4 rounded-xl transition shadow-md">
+                            Submit
+                        </button>
+                    </div>
+                    <p id="code-error" class="text-[10px] text-red-400 mt-1 hidden">Incorrect code. Please try again.</p>
+                </div>
+
+                <button onclick="backToPlans()" class="text-slate-400 hover:text-white text-xs font-semibold w-full text-center">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Back to plans
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <!-- ============================== PAGE JAVASCRIPT =============================== -->
     <script>
         function switchTab(tab) {
@@ -393,7 +494,6 @@
             const pass = document.getElementById("login-password").value;
             const btn = document.getElementById("login-btn");
 
-            // Require at least 3 characters for username and 6 characters for password
             if (user.length >= 3 && pass.length >= 6) {
                 btn.classList.remove("btn-inactive");
                 btn.classList.add("btn-active");
@@ -408,7 +508,6 @@
             const pass = document.getElementById("reg-password").value;
             const btn = document.getElementById("reg-btn");
 
-            // Require at least 3 characters for username and 6 characters for password
             if (user.length >= 3 && pass.length >= 6) {
                 btn.classList.remove("btn-inactive");
                 btn.classList.add("btn-active");
@@ -441,9 +540,67 @@
             document.getElementById("auth-modal").classList.add("hidden");
         }
 
+        // ==============================
+        // SUBSCRIPTION & CODE FLOW LOGIC
+        // ==============================
+        function goToPaymentStep() {
+            document.getElementById("sub-step-1").classList.add("hidden");
+            document.getElementById("sub-step-2").classList.remove("hidden");
+        }
+
+        function backToPlans() {
+            document.getElementById("sub-step-2").classList.add("hidden");
+            document.getElementById("sub-step-1").classList.remove("hidden");
+        }
+
+        function copyCbeAccount() {
+            const accountText = document.getElementById("cbe-account").innerText;
+            navigator.clipboard.writeText(accountText).then(() => {
+                showAlert("Copied", "CBE Account number copied to clipboard!");
+            });
+        }
+
+        // የተሻሻለችው ፈጣን ምላሽ እና አኒሜሽን ያለው የቴሌግራም ሊንክ ፈንክሽን
+        function sendReceiptTelegram() {
+            const btn = document.getElementById("telegram-btn");
+            const icon = document.getElementById("tg-icon");
+            const text = document.getElementById("tg-text");
+
+            // የጫኑት ጊዜ የሚታይ ፈጣን አኒሜሽን እና የሎዲንግ ስቴት
+            btn.classList.add("scale-95", "bg-sky-700");
+            icon.className = "fa-solid fa-spinner fa-spin text-sm";
+            text.innerText = "Connecting...";
+
+            setTimeout(() => {
+                // አኒሜሽኑን ወደነበረበት መመለስ
+                btn.classList.remove("scale-95", "bg-sky-700");
+                icon.className = "fa-brands fa-telegram text-sm";
+                text.innerText = "ደረሰኝ ላክ (Send Receipt)";
+
+                // ቀጥታ ወደ ቴሌግራም መክፈቻ መውሰድ
+                window.open("https://t.me/argaw89", "_blank");
+            }, 300);
+        }
+
+        function verifyAccessCode() {
+            const inputCode = document.getElementById("access-code-input").value.trim();
+            const errorMsg = document.getElementById("code-error");
+            
+            // ማግበሪያ ኮድ (እዚህ ጋር የፈለግከውን ኮድ ማድረግ ትችላለህ)
+            const validCode = "AGB2026"; 
+
+            if (inputCode === validCode) {
+                // ትክክለኛ ኮድ ሲገባ ፖፕአፑ ይጠፋል
+                document.getElementById("subscription-modal").classList.add("hidden");
+            } else {
+                errorMsg.classList.remove("hidden");
+            }
+        }
+
         // Initialize button states on load
         window.addEventListener("DOMContentLoaded", () => {
             validateLoginForm();
+            document.getElementById("subscription-modal").classList.remove("hidden");
         });
     </script>
 </body>
