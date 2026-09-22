@@ -109,18 +109,23 @@
                     <h2 id="summary-title" class="text-xs font-bold uppercase tracking-wider text-slate-400">Monthly Performance</h2>
                     <span id="monthly-avg-pct" class="text-sm font-extrabold text-emerald-400">0% Completed</span>
                 </div>
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                        <p class="text-[10px] text-slate-400 mb-1">Total Tracked Days</p>
-                        <p id="stat-total-days" class="text-lg font-extrabold text-slate-100">0</p>
+                <!-- 4 Columns Grid -->
+                <div class="grid grid-cols-4 gap-2 text-center">
+                    <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                        <p class="text-[9px] text-slate-400 mb-1">Total Tracked</p>
+                        <p id="stat-total-days" class="text-base font-extrabold text-slate-100">0</p>
                     </div>
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                        <p class="text-[10px] text-slate-400 mb-1">Full Completed</p>
-                        <p id="stat-full-days" class="text-lg font-extrabold text-emerald-400">0</p>
+                    <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                        <p class="text-[9px] text-slate-400 mb-1">Full Completed</p>
+                        <p id="stat-full-days" class="text-base font-extrabold text-emerald-400">0</p>
                     </div>
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                        <p class="text-[10px] text-slate-400 mb-1">Active Streak</p>
-                        <p id="stat-streak" class="text-lg font-extrabold text-amber-400">0 d</p>
+                    <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                        <p class="text-[9px] text-slate-400 mb-1">Active Streak</p>
+                        <p id="stat-streak" class="text-base font-extrabold text-amber-400">0 d</p>
+                    </div>
+                    <div class="bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-500/30">
+                        <p class="text-[9px] text-emerald-400/80 mb-1">All Days</p>
+                        <p id="stat-all-days" class="text-base font-extrabold text-emerald-300">0</p>
                     </div>
                 </div>
             </div>
@@ -287,7 +292,6 @@
             db.ref('users/' + userId + '/history').on('value', snapshot => {
                 globalHistoryData = snapshot.val() || {};
                 
-                // የቀን 11 መረጃን ከ Firebase ላይ እንሰርዛለን (ካለ)
                 let correctionKey11 = currentEth.year + '-' + (currentEth.month + 1) + '-11';
                 if (globalHistoryData[correctionKey11]) {
                     db.ref('users/' + userId + '/history/' + correctionKey11).remove();
@@ -297,7 +301,6 @@
                 let taskStats = calculateTaskPercentages();
                 let todayKey = currentEth.year + '-' + (currentEth.month + 1) + '-' + currentEth.day;
                 
-                // ከቀን 12 ጀምሮ ያሉት ቀናት ብቻ የየራሳቸውን ፐርሰንት በየዕለቱ ይመዘግባሉ
                 if (currentEth.day >= 12 && taskStats.totalTasks > 0) {
                     globalHistoryData[todayKey] = {
                         date: ethMonths[currentEth.month] + ' ' + currentEth.day + '፣ ' + currentEth.year,
@@ -406,11 +409,15 @@
 
             document.getElementById('calendar-grid').innerHTML = calendarGridHtml;
 
+            // አጠቃላይ የሁሉም ወራቶች ጠቅላላ የቀን ድምር (All Days Total Count)
+            let totalAllDaysCount = Object.keys(globalHistoryData).length;
+
             let avgMonthlyPct = monthTrackedDays > 0 ? Math.round(monthPctSum / monthTrackedDays) : 0;
             document.getElementById('monthly-avg-pct').innerText = avgMonthlyPct + '% Completed';
             document.getElementById('stat-total-days').innerText = monthTrackedDays;
             document.getElementById('stat-full-days').innerText = monthFullDays;
             document.getElementById('stat-streak').innerText = monthFullDays + ' d';
+            document.getElementById('stat-all-days').innerText = totalAllDaysCount;
 
             let logsHtml = '';
             let filteredKeys = Object.keys(globalHistoryData).filter(k => {
