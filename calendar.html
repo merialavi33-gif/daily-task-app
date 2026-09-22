@@ -192,6 +192,51 @@
         const ethMonths = ["መስከረም", "ጥቅምት", "ህዳር", "ታህሳስ", "ጥር", "የካቲት", "መጋቢት", "ሚያዚያ", "ግንቦት", "ሰኔ", "ሀምሌ", "ነሐሴ", "ጳጉሜ"];
         
         let globalHistoryData = {};
+        
+        // የኢትዮጵያ ሰዓት አቆጣጠር (ከምሽቱ 13:00 / ከማታ 1 ሰዓት በኋላ ከሆነ ቀኑን ወደ ቀጣይ ቀን እያሸጋገረ የሚያሰላ)
+        function getEthDateDetails(date) {
+            let targetDate = new Date(date.getTime());
+            
+            // ሰዓቱን እንወስዳለን
+            let localHour = targetDate.getHours();
+            
+            // ከምሽቱ 13 ሰዓት (በመደበኛ 24 ሰዓት አቆጣጠር 13:00 ወይም ከማታ 1 ሰዓት) ጀምሮ አዲሱ ቀን እንዲጀምር ተደረገ
+            if (localHour >= 13) {
+                targetDate.setDate(targetDate.getDate() + 1);
+            }
+
+            const gYear = targetDate.getFullYear();
+            const gMonth = targetDate.getMonth();
+            const gDay = targetDate.getDate();
+            
+            let ethYear = gYear - 8;
+            let sep11 = new Date(gYear, 8, 11);
+            if ((ethYear + 1) % 4 === 0) {
+                sep11 = new Date(gYear, 8, 12);
+            }
+
+            let dTarget = new Date(gYear, gMonth, gDay);
+            let diffDays = Math.floor((dTarget - new Date(gYear, 0, 1)) / (1000 * 60 * 60 * 24)) - Math.floor((sep11 - new Date(gYear, 0, 1)) / (1000 * 60 * 60 * 24));
+
+            if (diffDays >= 0) {
+                ethYear = gYear - 7;
+                let ethMonth = Math.floor(diffDays / 30);
+                let ethDay = (diffDays % 30) + 1;
+                if (ethMonth > 12) ethMonth = 12;
+                return { day: ethDay, month: ethMonth, year: ethYear };
+            } else {
+                let prevEthYear = ethYear;
+                let prevSep11 = new Date(gYear - 1, 8, 11);
+                if ((prevEthYear + 1) % 4 === 0) {
+                    prevSep11 = new Date(gYear - 1, 8, 12);
+                }
+                let diffPrev = Math.floor((dTarget - prevSep11) / (1000 * 60 * 60 * 24));
+                let ethMonth = Math.floor(diffPrev / 30);
+                let ethDay = (diffPrev % 30) + 1;
+                return { day: ethDay, month: ethMonth, year: ethYear };
+            }
+        }
+
         let today = new Date();
         let currentEth = getEthDateDetails(today);
         let selectedMonth = currentEth.month;
@@ -208,39 +253,6 @@
         document.getElementById('custom-modal-close').addEventListener('click', () => {
             document.getElementById('custom-modal').classList.add('hidden');
         });
-
-        function getEthDateDetails(date) {
-            const gYear = date.getFullYear();
-            const gMonth = date.getMonth();
-            const gDay = date.getDate();
-            
-            let ethYear = gYear - 8;
-            let sep11 = new Date(gYear, 8, 11);
-            if ((ethYear + 1) % 4 === 0) {
-                sep11 = new Date(gYear, 8, 12);
-            }
-
-            let targetDate = new Date(gYear, gMonth, gDay);
-            let diffDays = Math.floor((targetDate - new Date(gYear, 0, 1)) / (1000 * 60 * 60 * 24)) - Math.floor((sep11 - new Date(gYear, 0, 1)) / (1000 * 60 * 60 * 24));
-
-            if (diffDays >= 0) {
-                ethYear = gYear - 7;
-                let ethMonth = Math.floor(diffDays / 30);
-                let ethDay = (diffDays % 30) + 1;
-                if (ethMonth > 12) ethMonth = 12;
-                return { day: ethDay, month: ethMonth, year: ethYear };
-            } else {
-                let prevEthYear = ethYear;
-                let prevSep11 = new Date(gYear - 1, 8, 11);
-                if ((prevEthYear + 1) % 4 === 0) {
-                    prevSep11 = new Date(gYear - 1, 8, 12);
-                }
-                let diffPrev = Math.floor((targetDate - prevSep11) / (1000 * 60 * 60 * 24));
-                let ethMonth = Math.floor(diffPrev / 30);
-                let ethDay = (diffPrev % 30) + 1;
-                return { day: ethDay, month: ethMonth, year: ethYear };
-            }
-        }
 
         function getEthMonthStartWeekday(ethYear, ethMonth) {
             let refYear = 2019;
@@ -301,7 +313,9 @@
                 let taskStats = calculateTaskPercentages();
                 let todayKey = currentEth.year + '-' + (currentEth.month + 1) + '-' + currentEth.day;
                 
-                if (currentEth.day >= 12 && taskStats.totalTasks > 0) {
+                let pendingSaveAndReset = localStorage.getItem('pending_save_reset');
+
+                if ((currentEth.day >= 12 && taskStats.totalTasks > 0) || pendingSaveAndReset === 'true') {
                     globalHistoryData[todayKey] = {
                         date: ethMonths[currentEth.month] + ' ' + currentEth.day + '፣ ' + currentEth.year,
                         pct: taskStats.pct,
@@ -312,6 +326,10 @@
                         dayVal: currentEth.day
                     };
                     db.ref('users/' + userId + '/history/' + todayKey).set(globalHistoryData[todayKey]);
+
+                    if (pendingSaveAndReset === 'true') {
+                        localStorage.removeItem('pending_save_reset');
+                    }
                 }
 
                 renderView();
@@ -409,7 +427,6 @@
 
             document.getElementById('calendar-grid').innerHTML = calendarGridHtml;
 
-            // አጠቃላይ የሁሉም ወራቶች ጠቅላላ የቀን ድምር (All Days Total Count)
             let totalAllDaysCount = Object.keys(globalHistoryData).length;
 
             let avgMonthlyPct = monthTrackedDays > 0 ? Math.round(monthPctSum / monthTrackedDays) : 0;
