@@ -193,18 +193,9 @@
         
         let globalHistoryData = {};
         
-        // የኢትዮጵያ ሰዓት አቆጣጠር (ከምሽቱ 13:00 / ከማታ 1 ሰዓት በኋላ ከሆነ ቀኑን ወደ ቀጣይ ቀን እያሸጋገረ የሚያሰላ)
         function getEthDateDetails(date) {
             let targetDate = new Date(date.getTime());
             
-            // ሰዓቱን እንወስዳለን
-            let localHour = targetDate.getHours();
-            
-            // ከምሽቱ 13 ሰዓት (በመደበኛ 24 ሰዓት አቆጣጠር 13:00 ወይም ከማታ 1 ሰዓት) ጀምሮ አዲሱ ቀን እንዲጀምር ተደረገ
-            if (localHour >= 13) {
-                targetDate.setDate(targetDate.getDate() + 1);
-            }
-
             const gYear = targetDate.getFullYear();
             const gMonth = targetDate.getMonth();
             const gDay = targetDate.getDate();
@@ -237,7 +228,11 @@
             }
         }
 
-        let today = new Date();
+        let now = new Date();
+        if (now.getHours() >= 19) {
+            now.setDate(now.getDate() + 1);
+        }
+        let today = now;
         let currentEth = getEthDateDetails(today);
         let selectedMonth = currentEth.month;
         let selectedYear = currentEth.year;
@@ -256,7 +251,7 @@
 
         function getEthMonthStartWeekday(ethYear, ethMonth) {
             let refYear = 2019;
-            let refWeekday = 4; // መስከረም 1፣ 2019 አርብ በመሆኑ (ሰኞ=0)
+            let refWeekday = 4;
 
             let totalDaysFromRef = 0;
             for (let y = refYear; y < ethYear; y++) {
@@ -304,10 +299,12 @@
             db.ref('users/' + userId + '/history').on('value', snapshot => {
                 globalHistoryData = snapshot.val() || {};
                 
-                let correctionKey11 = currentEth.year + '-' + (currentEth.month + 1) + '-11';
-                if (globalHistoryData[correctionKey11]) {
-                    db.ref('users/' + userId + '/history/' + correctionKey11).remove();
-                    delete globalHistoryData[correctionKey11];
+                for (let d = 13; d <= 16; d++) {
+                    let wrongKey = currentEth.year + '-' + (currentEth.month + 1) + '-' + d;
+                    if (globalHistoryData[wrongKey]) {
+                        db.ref('users/' + userId + '/history/' + wrongKey).remove();
+                        delete globalHistoryData[wrongKey];
+                    }
                 }
 
                 let taskStats = calculateTaskPercentages();
@@ -315,7 +312,7 @@
                 
                 let pendingSaveAndReset = localStorage.getItem('pending_save_reset');
 
-                if ((currentEth.day >= 12 && taskStats.totalTasks > 0) || pendingSaveAndReset === 'true') {
+                if (taskStats.completedTasks > 0 || pendingSaveAndReset === 'true') {
                     globalHistoryData[todayKey] = {
                         date: ethMonths[currentEth.month] + ' ' + currentEth.day + '፣ ' + currentEth.year,
                         pct: taskStats.pct,
@@ -449,18 +446,18 @@
                     let item = globalHistoryData[k];
                     logsHtml += `
                         <div class="history-card p-3.5 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
+                            <div class="history-card-content flex items-center gap-3 w-full">
                                 <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-xs">
                                     ${item.pct}%
                                 </div>
-                                <div>
+                                <div class="flex-1">
                                     <h4 class="text-xs font-bold text-slate-100">${item.date}</h4>
                                     <p class="text-[10px] text-slate-400 mt-0.5">Completed Tasks: <span class="text-slate-300 font-semibold">${item.completed} / ${item.total}</span></p>
                                 </div>
+                                <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full ${item.pct === 100 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-emerald-500/30'}">
+                                    ${item.pct === 100 ? 'Completed' : 'In Progress'}
+                                </span>
                             </div>
-                            <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full ${item.pct === 100 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-emerald-500/30'}">
-                                ${item.pct === 100 ? 'Completed' : 'In Progress'}
-                            </span>
                         </div>
                     `;
                 });
