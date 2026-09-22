@@ -146,8 +146,8 @@
                     </div>
                 </div>
                 
-                <!-- Week Days Header -->
-                <div class="grid grid-cols-7 gap-1.5 mb-2 text-center text-[11px] font-bold text-slate-400">
+                <!-- Week Days Header (Fixed formatting to prevent overlapping) -->
+                <div class="grid grid-cols-7 gap-1 mb-2 text-center text-[10px] font-bold text-slate-400">
                     <span>ሰኞ</span><span>ማክሰ</span><span>ረቡዕ</span><span>ሐሙስ</span><span>አርብ</span><span>ቅዳሜ</span><span>እሁድ</span>
                 </div>
 
@@ -296,7 +296,8 @@
         }
 
         function loadUserData(userId) {
-            db.ref('users/' + userId + '/history').on('value', snapshot => {
+            // ዳታውን አንዴ ብቻ በፈጣን ሁኔታ እንዲጭን .once ተጠቀምን (Loading እንዳይረዝም)
+            db.ref('users/' + userId + '/history').once('value').then(snapshot => {
                 globalHistoryData = snapshot.val() || {};
                 
                 for (let d = 13; d <= 16; d++) {
@@ -329,6 +330,9 @@
                     }
                 }
 
+                renderView();
+            }).catch(error => {
+                console.error("Error loading history:", error);
                 renderView();
             });
         }
