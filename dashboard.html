@@ -347,8 +347,8 @@
                 <div id="countdown-timer" class="text-xl font-bold text-cyan-400 mt-0.5 font-mono">00:00:00</div>
             </div>
             <div class="text-right">
-                <button id="reset-btn" class="text-[11px] bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3.5 py-2.5 rounded-xl transition-all active:scale-95 flex items-center gap-1.5 font-semibold shadow-sm">
-                    <i class="fa-solid fa-rotate-left"></i>Reset Ticks
+                <button id="reset-btn" class="text-[11px] bg-rose-500/10 hover:bg-rose-500/20 text-emerald-400 border border-rose-500/50 px-3.5 py-2.5 rounded-xl transition-all active:scale-95 flex items-center gap-1.5 font-semibold shadow-sm">
+                    <i class="fa-solid fa-floppy-disk"></i>Save & Reset
                 </button>
             </div>
         </div>
@@ -392,7 +392,6 @@
         <!-- Quick Phone Filter Buttons Bar -->
         <section>
             <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-2">Phones</p>
-            <!-- All የሚለው በተን ከሁለቱ ረድፎች አናትና ታች መካከል በትክክል ሴንተር እንዲሆን የተደረገበት ክፍል -->
             <div class="grid grid-cols-4 gap-2 items-center">
                 <button class="phone-filter-btn active py-4" data-phone="all">All <span id="phone-badge-all" class="phone-badge">0</span></button>
                 <div class="col-span-3 grid grid-cols-3 gap-2">
@@ -779,18 +778,33 @@
             return dayName + "፣ " + ethMonths[ethMonth] + " " + ethDay + "፣ " + ethYear + " ዓ.ም.";
         }
 
+        let lastAutoResetDate = localStorage.getItem('last_auto_reset_date') || '';
+
         function updateClockAndCountdown() {
             const now = new Date();
             const dateElem = document.getElementById('ethiopian-date-display');
             if (dateElem) {
                 dateElem.innerHTML = '<i class="fa-regular fa-calendar-days text-amber-400"></i> ' + toEthiopianDate(now);
             }
+            
+            // የኢትዮጵያ ሰአት አቆጣጠር ከምሽቱ 1:00 (13:00) ማለት ከቀኑ 7:00 ሰአት (19:00 PM) ጋር እኩል ነው።
             let targetTime = new Date();
             targetTime.setHours(19, 0, 0, 0);
+            
             if (now >= targetTime) {
                 targetTime.setDate(targetTime.getDate() + 1);
             }
+            
             let diff = targetTime - now;
+            
+            // ሰአቱ ከምሽቱ 1:00 (19:00) ሲደርስ (ማለትም diff ወደ 0 ሲጠጋ ወይም ካለፈ) እና ዛሬ አሁንም አውቶማቲክ ሪሴት ካልተደረገ በራስ ሰር ሴቭ እና ሪሴት ይደረጋል
+            let currentDateStr = now.toDateString();
+            if (now.getHours() === 19 && now.getMinutes() === 0 && now.getSeconds() === 0 && lastAutoResetDate !== currentDateStr) {
+                lastAutoResetDate = currentDateStr;
+                localStorage.setItem('last_auto_reset_date', currentDateStr);
+                autoResetTasks();
+            }
+
             let hours = Math.floor(diff / (1000 * 60 * 60));
             let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             let seconds = Math.floor((diff % (1000 * 60)) / 1000);
@@ -801,6 +815,7 @@
         }
 
         function autoResetTasks() {
+            localStorage.setItem('pending_save_reset', 'true');
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             let updates = {};
             checkboxes.forEach(cb => {
@@ -1130,7 +1145,7 @@
             }
             
             document.getElementById('reset-btn').addEventListener('click', function() {
-                showCustomConfirm('Confirmation', 'Do you want to reset today ticks only?', (confirmed) => {
+                showCustomConfirm('Confirmation', 'Do you want to save & reset today ticks?', (confirmed) => {
                     if (confirmed) {
                         autoResetTasks();
                     }
