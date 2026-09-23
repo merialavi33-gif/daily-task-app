@@ -26,8 +26,8 @@
         ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 3px; }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .unified-glass-panel {
             background: rgba(15, 23, 42, 0.85) !important;
@@ -61,7 +61,7 @@
             background: rgba(16, 185, 129, 0.15);
         }
         .history-card {
-            animation: fadeIn 0.2s ease-out forwards;
+            animation: fadeIn 0.3s ease-out forwards;
             background: rgba(15, 23, 42, 0.7) !important;
             border: 1px solid rgba(16, 185, 129, 0.25);
             border-radius: 16px;
@@ -146,8 +146,8 @@
                     </div>
                 </div>
                 
-                <!-- Week Days Header (Fixed formatting to prevent overlapping) -->
-                <div class="grid grid-cols-7 gap-1 mb-2 text-center text-[10px] font-bold text-slate-400">
+                <!-- Week Days Header -->
+                <div class="grid grid-cols-7 gap-1.5 mb-2 text-center text-[11px] font-bold text-slate-400">
                     <span>ሰኞ</span><span>ማክሰ</span><span>ረቡዕ</span><span>ሐሙስ</span><span>አርብ</span><span>ቅዳሜ</span><span>እሁድ</span>
                 </div>
 
@@ -161,7 +161,7 @@
             <div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">History Logs</h3>
                 <div id="history-logs-container" class="space-y-2.5">
-                    <div class="text-center py-8 text-slate-500 text-xs">
+                    <div class="text-center py-6 text-slate-500 text-xs bg-slate-900/40 rounded-xl border border-slate-800">
                         <i class="fa-solid fa-spinner fa-spin text-base mb-1"></i>
                         <p>Loading history logs...</p>
                     </div>
@@ -237,7 +237,17 @@
         let selectedMonth = currentEth.month;
         let selectedYear = currentEth.year;
 
+        // --- INSTANT RENDER (FAST LOAD CACHE FALLBACK) ---
         document.getElementById('current-month-label').innerText = ethMonths[selectedMonth] + ' ' + selectedYear;
+        
+        let cachedHistory = localStorage.getItem('cached_global_history');
+        if (cachedHistory) {
+            try {
+                globalHistoryData = JSON.parse(cachedHistory);
+                renderView(); // ወዲያውኑ የቀደመውን ዳታ ሎድ ሳይጠብቅ ያሳያል
+            } catch (e) {}
+        }
+        // -------------------------------------------------
 
         function showAlert(title, message) {
             document.getElementById('custom-modal-title').innerText = title;
@@ -296,10 +306,12 @@
         }
 
         function loadUserData(userId) {
-            // ዳታውን አንዴ ብቻ በፈጣን ሁኔታ እንዲጭን .once ተጠቀምን (Loading እንዳይረዝም)
-            db.ref('users/' + userId + '/history').once('value').then(snapshot => {
+            db.ref('users/' + userId + '/history').on('value', snapshot => {
                 globalHistoryData = snapshot.val() || {};
                 
+                // Cache locally for instant loading next time
+                localStorage.setItem('cached_global_history', JSON.stringify(globalHistoryData));
+
                 for (let d = 13; d <= 16; d++) {
                     let wrongKey = currentEth.year + '-' + (currentEth.month + 1) + '-' + d;
                     if (globalHistoryData[wrongKey]) {
@@ -311,18 +323,33 @@
                 let taskStats = calculateTaskPercentages();
                 let todayKey = currentEth.year + '-' + (currentEth.month + 1) + '-' + currentEth.day;
                 
+                let lastRecordedDate = localStorage.getItem('last_recorded_date');
+                if (lastRecordedDate && lastRecordedDate !== todayKey) {
+                    let prevDayData = localStorage.getItem('last_day_stats');
+                    if (prevDayData) {
+                        let parsedPrev = JSON.parse(prevDayData);
+                        globalHistoryData[lastRecordedDate] = parsedPrev;
+                        db.ref('users/' + userId + '/history/' + lastRecordedDate).set(parsedPrev);
+                    }
+                }
+
+                let currentDayRecord = {
+                    date: ethMonths[currentEth.month] + ' ' + currentEth.day + '፣ ' + currentEth.year,
+                    pct: taskStats.pct,
+                    completed: taskStats.completedTasks,
+                    total: taskStats.totalTasks,
+                    monthIndex: currentEth.month,
+                    yearVal: currentEth.year,
+                    dayVal: currentEth.day
+                };
+                
+                localStorage.setItem('last_recorded_date', todayKey);
+                localStorage.setItem('last_day_stats', JSON.stringify(currentDayRecord));
+
                 let pendingSaveAndReset = localStorage.getItem('pending_save_reset');
 
                 if (taskStats.completedTasks > 0 || pendingSaveAndReset === 'true') {
-                    globalHistoryData[todayKey] = {
-                        date: ethMonths[currentEth.month] + ' ' + currentEth.day + '፣ ' + currentEth.year,
-                        pct: taskStats.pct,
-                        completed: taskStats.completedTasks,
-                        total: taskStats.totalTasks,
-                        monthIndex: currentEth.month,
-                        yearVal: currentEth.year,
-                        dayVal: currentEth.day
-                    };
+                    globalHistoryData[todayKey] = currentDayRecord;
                     db.ref('users/' + userId + '/history/' + todayKey).set(globalHistoryData[todayKey]);
 
                     if (pendingSaveAndReset === 'true') {
@@ -330,9 +357,6 @@
                     }
                 }
 
-                renderView();
-            }).catch(error => {
-                console.error("Error loading history:", error);
                 renderView();
             });
         }
