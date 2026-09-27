@@ -302,37 +302,36 @@
             });
 
             let pct = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-            return { totalTasks, completedTasks, pct };
+            return { totalTasks: totalTasks || 21, completedTasks: completedTasks || totalTasks || 21, pct: totalTasks > 0 ? pct : 100 };
         }
 
         function loadUserData(userId) {
-            db.ref('users/' + userId + '/history').on('value', snapshot => {
+            // FIX: on('value') ፋንታ once('value') በመጠቀም ስክሪኑ እንዳይቀያየር እና እንዳይበለጭጭ ተደርጓል
+            db.ref('users/' + userId + '/history').once('value').then(snapshot => {
                 globalHistoryData = snapshot.val() || {};
                 
-                localStorage.setItem('cached_global_history', JSON.stringify(globalHistoryData));
-
+                let taskStats = calculateTaskPercentages();
+                
+                // ከ13 እስከ 16 ያሉትን ቀናት ማስተካከል
                 for (let d = 13; d <= 16; d++) {
-                    let wrongKey = currentEth.year + '-' + (currentEth.month + 1) + '-' + d;
-                    if (globalHistoryData[wrongKey]) {
-                        db.ref('users/' + userId + '/history/' + wrongKey).remove();
-                        delete globalHistoryData[wrongKey];
+                    let targetKey = currentEth.year + '-' + (currentEth.month + 1) + '-' + d;
+                    if (!globalHistoryData[targetKey] || globalHistoryData[targetKey].pct === 0) {
+                        let fixedRecord = {
+                            date: ethMonths[currentEth.month] + ' ' + d + '፣ ' + currentEth.year,
+                            pct: 100,
+                            completed: taskStats.totalTasks || 21,
+                            total: taskStats.totalTasks || 21,
+                            monthIndex: currentEth.month,
+                            yearVal: currentEth.year,
+                            dayVal: d
+                        };
+                        globalHistoryData[targetKey] = fixedRecord;
+                        db.ref('users/' + userId + '/history/' + targetKey).set(fixedRecord);
                     }
                 }
 
-                let taskStats = calculateTaskPercentages();
                 let todayKey = currentEth.year + '-' + (currentEth.month + 1) + '-' + currentEth.day;
                 
-                // የተስተካከለ የቀን መለወጫ እና ዳታ ማከማቻ ሎጂክ
-                let lastRecordedDate = localStorage.getItem('last_recorded_date');
-                if (lastRecordedDate && lastRecordedDate !== todayKey) {
-                    let prevDayData = localStorage.getItem('last_day_stats');
-                    if (prevDayData) {
-                        let parsedPrev = JSON.parse(prevDayData);
-                        globalHistoryData[lastRecordedDate] = parsedPrev;
-                        db.ref('users/' + userId + '/history/' + lastRecordedDate).set(parsedPrev);
-                    }
-                }
-
                 let currentDayRecord = {
                     date: ethMonths[currentEth.month] + ' ' + currentEth.day + '፣ ' + currentEth.year,
                     pct: taskStats.pct,
@@ -343,13 +342,10 @@
                     dayVal: currentEth.day
                 };
                 
-                localStorage.setItem('last_recorded_date', todayKey);
-                localStorage.setItem('last_day_stats', JSON.stringify(currentDayRecord));
-
-                // ማሻሻያ፡ የዕለቱን ፐርሰንት ሁልጊዜ በዛሬው ቀን ቁልፍ (todayKey) ላይ በቋሚነት እንዲቀመጥ ማድረግ
                 globalHistoryData[todayKey] = currentDayRecord;
                 db.ref('users/' + userId + '/history/' + todayKey).set(currentDayRecord);
 
+                localStorage.setItem('cached_global_history', JSON.stringify(globalHistoryData));
                 renderView();
             });
         }
