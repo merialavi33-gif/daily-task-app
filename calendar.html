@@ -244,7 +244,7 @@
         if (cachedHistory) {
             try {
                 globalHistoryData = JSON.parse(cachedHistory);
-                renderView(); // ወዲያውኑ የቀደመውን ዳታ ሎድ ሳይጠብቅ ያሳያል
+                renderView(); 
             } catch (e) {}
         }
         // -------------------------------------------------
@@ -309,7 +309,6 @@
             db.ref('users/' + userId + '/history').on('value', snapshot => {
                 globalHistoryData = snapshot.val() || {};
                 
-                // Cache locally for instant loading next time
                 localStorage.setItem('cached_global_history', JSON.stringify(globalHistoryData));
 
                 for (let d = 13; d <= 16; d++) {
@@ -323,6 +322,7 @@
                 let taskStats = calculateTaskPercentages();
                 let todayKey = currentEth.year + '-' + (currentEth.month + 1) + '-' + currentEth.day;
                 
+                // የተስተካከለ የቀን መለወጫ እና ዳታ ማከማቻ ሎጂክ
                 let lastRecordedDate = localStorage.getItem('last_recorded_date');
                 if (lastRecordedDate && lastRecordedDate !== todayKey) {
                     let prevDayData = localStorage.getItem('last_day_stats');
@@ -346,16 +346,9 @@
                 localStorage.setItem('last_recorded_date', todayKey);
                 localStorage.setItem('last_day_stats', JSON.stringify(currentDayRecord));
 
-                let pendingSaveAndReset = localStorage.getItem('pending_save_reset');
-
-                if (taskStats.completedTasks > 0 || pendingSaveAndReset === 'true') {
-                    globalHistoryData[todayKey] = currentDayRecord;
-                    db.ref('users/' + userId + '/history/' + todayKey).set(globalHistoryData[todayKey]);
-
-                    if (pendingSaveAndReset === 'true') {
-                        localStorage.removeItem('pending_save_reset');
-                    }
-                }
+                // ማሻሻያ፡ የዕለቱን ፐርሰንት ሁልጊዜ በዛሬው ቀን ቁልፍ (todayKey) ላይ በቋሚነት እንዲቀመጥ ማድረግ
+                globalHistoryData[todayKey] = currentDayRecord;
+                db.ref('users/' + userId + '/history/' + todayKey).set(currentDayRecord);
 
                 renderView();
             });
@@ -464,7 +457,7 @@
             let logsHtml = '';
             let filteredKeys = Object.keys(globalHistoryData).filter(k => {
                 let item = globalHistoryData[k];
-                return item.yearVal === selectedYear && item.monthIndex === selectedMonth;
+                return item && item.yearVal === selectedYear && item.monthIndex === selectedMonth;
             }).sort().reverse();
 
             if (filteredKeys.length === 0) {
