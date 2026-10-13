@@ -9,84 +9,139 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    <!-- Firebase SDKs (Compat - For Realtime Database & Auth) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
     <style>
-        * { -webkit-tap-highlight-color: transparent; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        * { 
+            -webkit-tap-highlight-color: transparent; 
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
         body { 
-            font-family: system-ui, -apple-system, sans-serif;
-            background: #0f172a !important;
+            background: #090d16 !important;
             color: #f8fafc !important;
             min-height: 100vh;
         }
 
-        ::-webkit-scrollbar { width: 6px; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
-        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 10px; }
 
+        /* Animation */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+        }
+
+        .glass-card-interactive {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card-interactive:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -10px rgba(16, 185, 129, 0.15);
+        }
+
         .device-card {
-            animation: fadeIn 0.3s ease-out forwards;
-            opacity: 0;
+            animation: fadeIn 0.35s ease-out forwards;
             background: rgba(15, 23, 42, 0.75) !important;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.1);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
         }
 
         .account-item-card {
             animation: fadeIn 0.3s ease-out forwards;
-            background: rgba(15, 23, 42, 0.65) !important;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: rgba(30, 41, 59, 0.4) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+        .account-item-card:hover {
+            background: rgba(30, 41, 59, 0.6) !important;
+            border-color: rgba(16, 185, 129, 0.3);
         }
 
         .unified-glass-panel {
-            background: rgba(15, 23, 42, 0.95) !important;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            background: rgba(15, 23, 42, 0.92) !important;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
-        .phone-title { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.03em; color: #38bdf8; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .task-label { font-weight: 600; font-size: 0.9rem; line-height: 1.4; color: #e2e8f0; }
-        .sub-task-label { font-weight: 500; font-size: 0.82rem; }
-        .app-header { font-weight: 700; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; }
+        .phone-title { 
+            font-size: 1.1rem; 
+            font-weight: 800; 
+            letter-spacing: -0.01em; 
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-        .checkbox-custom { width: 1.25rem; height: 1.25rem; accent-color: #065f46; cursor: pointer; flex-shrink: 0; }
-        .checkbox-custom.sub { width: 1.1rem; height: 1.1rem; accent-color: #065f46; }
+        .task-label { font-weight: 600; font-size: 0.88rem; color: #f1f5f9; }
+        .sub-task-label { font-weight: 500; font-size: 0.82rem; }
+        .app-header { font-weight: 800; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+        /* Modern Custom Checkbox */
+        .checkbox-custom { 
+            width: 1.3rem; 
+            height: 1.3rem; 
+            accent-color: #10b981; 
+            cursor: pointer; 
+            flex-shrink: 0;
+            border-radius: 6px;
+            transition: transform 0.15s ease;
+        }
+        .checkbox-custom:active { transform: scale(0.85); }
+        .checkbox-custom.sub { width: 1.15rem; height: 1.15rem; }
         
         .checkbox-custom:checked + label,
         input[type="checkbox"]:checked ~ label { 
             text-decoration: line-through; 
-            color: #065f46 !important; 
-            font-weight: 700; 
+            color: #64748b !important; 
+            font-weight: 600; 
             transition: all 0.3s ease; 
         }
 
-        .device-progress-bg { background: linear-gradient(90deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%); }
-        .device-progress-fill { background: linear-gradient(90deg, #f59e0b 0%, #10b981 100%); transition: width 0.5s ease; }
+        .device-progress-bg { background: rgba(30, 41, 59, 0.8); }
+        .device-progress-fill { 
+            background: linear-gradient(90deg, #f59e0b 0%, #10b981 100%); 
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
 
-        .glass-header { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .glass-header { 
+            background: rgba(9, 13, 22, 0.8); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px); 
+        }
+
         .stat-card { 
-            background: rgba(15, 23, 42, 0.75) !important; 
+            background: rgba(15, 23, 42, 0.6) !important; 
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(16, 185, 129, 0.3); 
-            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.07); 
+            border-radius: 1.25rem;
+            transition: all 0.2s ease;
         }
 
         @keyframes pulse-green {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.4); }
-            50% { box-shadow: 0 0 0 6px rgba(45, 212, 191, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
         }
         .completed-badge { animation: pulse-green 2s infinite; }
 
@@ -97,56 +152,54 @@
         .urgent-pulse { animation: pulse-urgent 1.2s infinite; }
 
         @keyframes blink-animation {
-            0% { opacity: 1; }
+            0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
-            100% { opacity: 1; }
         }
         .blink-icon { animation: blink-animation 1.5s infinite; }
 
-        .toggle-btn i { transition: transform 0.2s ease; }
+        .toggle-btn i { transition: transform 0.25s ease; }
         .toggle-btn.open i { transform: rotate(180deg); }
 
         .btn-view-tracker {
             padding: 6px 10px;
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            border-radius: 8px;
-            font-size: 1rem;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 10px;
+            font-size: 0.9rem;
             color: #f59e0b;
             transition: all 0.2s ease;
         }
-        .btn-view-tracker:active { transform: scale(0.9); }
+        .btn-view-tracker:hover { background: rgba(245, 158, 11, 0.25); }
+        .btn-view-tracker:active { transform: scale(0.92); }
 
         .task-row { transition: all 0.2s ease; }
-        .task-row:hover { background: rgba(30, 41, 59, 0.6); border-color: rgba(71, 85, 105, 0.6); }
 
         canvas { position: fixed !important; top: 0; left: 0; pointer-events: none; z-index: 9999; }
 
         .btn-day-adjust {
             font-weight: 700;
-            font-size: 0.72rem;
-            padding: 4px 8px;
-            border-radius: 6px;
+            font-size: 0.7rem;
+            padding: 5px 10px;
+            border-radius: 8px;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 3px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            gap: 4px;
         }
         .btn-day-edit {
             background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
             color: #ffffff;
-            border: 1px solid #fbbf24;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
         }
         .btn-day-save {
             background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             color: #ffffff;
-            border: 1px solid #34d399;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
         }
         .btn-day-reset {
             background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
             color: #ffffff;
-            border: 1px solid #f87171;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
         }
         
         .point-input {
@@ -155,30 +208,30 @@
             color: #f59e0b;
             font-weight: bold;
             padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: 6px;
             width: 105px;
             text-align: center;
         }
 
-        .custom-modal-bg { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); }
+        .custom-modal-bg { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); }
         .custom-modal-box {
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
 
         .filter-container-bg {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(245, 158, 11, 0.12) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .filter-tab {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(30, 41, 59, 0.5);
             color: #94a3b8;
-            border: 1px solid #10b981/40;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 0.75rem;
             font-weight: 700;
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 9999px;
             transition: all 0.2s ease;
             white-space: nowrap;
@@ -187,24 +240,23 @@
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff;
             border-color: #34d399;
-            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
         }
 
         .phone-filter-btn {
-            background: rgba(15, 23, 42, 0.75);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #cbd5e1;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
             font-size: 0.75rem;
-            font-weight: 600;
-            padding: 8px 6px;
-            border-radius: 12px;
+            font-weight: 700;
+            padding: 10px 8px;
+            border-radius: 14px;
             transition: all 0.2s ease;
             white-space: nowrap;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
-            backdrop-filter: blur(8px);
             position: relative;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -213,24 +265,24 @@
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: #0f172a;
             border-color: #fbbf24;
-            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.35);
-            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+            font-weight: 800;
         }
 
         .phone-badge {
             position: absolute;
-            top: 3px;
-            right: 4px;
+            top: 4px;
+            right: 5px;
             background-color: #ef4444;
             color: #ffffff;
             font-size: 9px;
             font-weight: 800;
-            padding: 0px 3px;
+            padding: 1px 4px;
             border-radius: 9999px;
-            line-height: 1.1;
-            min-width: 14px;
+            line-height: 1;
+            min-width: 15px;
             text-align: center;
-            box-shadow: 0 1px 2px rgba(239, 68, 68, 0.4);
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
         }
         .phone-filter-btn.active .phone-badge {
             background-color: #0f172a;
@@ -238,7 +290,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="min-h-screen pb-24">
 
     <!-- Custom Popup Modal Container -->
     <div id="custom-modal" class="fixed inset-0 z-[100] custom-modal-bg flex items-center justify-center p-4 hidden">
@@ -256,30 +308,30 @@
     </div>
 
     <!-- Top Navigation / Header -->
-    <header class="glass-header border-b border-emerald-500/20 sticky top-0 z-50 px-4 py-3">
+    <header class="glass-header border-b border-white/10 sticky top-0 z-50 px-4 py-3.5">
         <div class="max-w-2xl mx-auto flex justify-between items-center">
-            <div>
-                <h1 class="text-base font-extrabold text-slate-100 tracking-wide">Task & Account Controller</h1>
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-sm shadow-md">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <h1 class="text-base font-extrabold text-slate-100 tracking-tight">Task Controller</h1>
             </div>
             <div class="flex items-center gap-2">
                 <div class="relative">
-                    <button id="menu-toggle-btn" class="w-10 h-10 bg-slate-800/90 hover:bg-slate-700 text-amber-400 border border-emerald-500/40 rounded-xl text-sm font-bold flex items-center justify-center transition shadow-md active:scale-95">
+                    <button id="menu-toggle-btn" class="w-10 h-10 bg-slate-800/80 hover:bg-slate-700 text-amber-400 border border-white/10 rounded-xl text-sm font-bold flex items-center justify-center transition shadow-md active:scale-95">
                         <i class="fa-solid fa-bars"></i>
                     </button>
-                    <!-- Professional Dropdown Menu Placed Perfectly -->
-                    <div id="dropdown-menu" class="hidden absolute right-0 mt-3 w-56 unified-glass-panel rounded-2xl shadow-2xl py-1.5 z-50 overflow-hidden border border-emerald-500/30">
-                        <button id="menu-accounts-btn" class="w-full text-left px-4 py-3 text-xs font-semibold text-slate-200 hover:bg-emerald-500/10 flex items-center justify-between transition">
-                            <span class="flex items-center gap-2"><i class="fa-solid fa-users-viewfinder text-amber-400"></i> Accounts Tracker</span>
+                    <!-- Professional Dropdown Menu -->
+                    <div id="dropdown-menu" class="hidden absolute right-0 mt-3 w-56 unified-glass-panel rounded-2xl shadow-2xl py-1.5 z-50 overflow-hidden border border-white/10">
+                        <button id="menu-accounts-btn" class="w-full text-left px-4 py-3 text-xs font-semibold text-slate-200 hover:bg-white/5 flex items-center justify-between transition">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-users-viewfinder text-amber-400"></i> Accounts Tracker</span>
                             <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
                         </button>
-                        <a href="calendar.html" class="w-full text-left px-4 py-3 text-xs font-semibold text-slate-200 hover:bg-emerald-500/10 flex items-center justify-between transition border-t border-slate-800">
-                            <span class="flex items-center gap-2"><i class="fa-solid fa-calendar-days text-amber-400"></i> Performance</span>
+                        <a href="setup.html" class="w-full text-left px-4 py-3 text-xs font-semibold text-slate-200 hover:bg-white/5 flex items-center justify-between transition border-t border-white/5">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-gear text-amber-400"></i> Setup</span>
                         </a>
-                        <a href="setup.html" class="w-full text-left px-4 py-3 text-xs font-semibold text-slate-200 hover:bg-emerald-500/10 flex items-center justify-between transition border-t border-slate-800">
-                            <span class="flex items-center gap-2"><i class="fa-solid fa-gear text-amber-400"></i> Setup</span>
-                        </a>
-                        <button id="menu-logout-btn" class="w-full text-left px-4 py-3 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 flex items-center justify-between transition border-t border-slate-800">
-                            <span class="flex items-center gap-2"><i class="fa-solid fa-right-from-bracket"></i> Sign out</span>
+                        <button id="menu-logout-btn" class="w-full text-left px-4 py-3 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 flex items-center justify-between transition border-t border-white/5">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-right-from-bracket"></i> Sign out</span>
                         </button>
                     </div>
                 </div>
@@ -288,12 +340,12 @@
     </header>
 
     <!-- Accounts Modal / Drawer -->
-    <div id="accounts-modal" class="fixed inset-0 z-[90] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="unified-glass-panel w-full max-w-lg rounded-3xl p-5 shadow-2xl animate-[fadeIn_0.2s_ease-out] max-h-[90vh] flex flex-col border border-emerald-500/40">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 flex-shrink-0">
-                <div class="flex items-center gap-2.5 min-w-0 pr-2">
-                    <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
-                        <i class="fa-solid fa-chart-line text-sm"></i>
+    <div id="accounts-modal" class="fixed inset-0 z-[90] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="unified-glass-panel w-full max-w-lg rounded-3xl p-5 shadow-2xl animate-[fadeIn_0.2s_ease-out] max-h-[90vh] flex flex-col border border-white/10">
+            <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3 flex-shrink-0">
+                <div class="flex items-center gap-3 min-w-0 pr-2">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
+                        <i class="fa-solid fa-chart-line text-base"></i>
                     </div>
                     <div class="min-w-0">
                         <h3 class="text-sm font-bold text-slate-100 truncate">Accounts Tracker</h3>
@@ -316,7 +368,7 @@
             <div id="accounts-list-container" class="space-y-3 overflow-y-auto pr-1 flex-1">
             </div>
             
-            <div class="pt-3 border-t border-slate-800 mt-3 text-center flex-shrink-0">
+            <div class="pt-3 border-t border-white/10 mt-3 text-center flex-shrink-0">
                 <p class="text-[10px] text-slate-500">🚀 Keep going! Accounts are sorted by remaining days.</p>
             </div>
         </div>
@@ -326,28 +378,28 @@
     <main class="max-w-2xl mx-auto p-4 space-y-4">
 
         <!-- Congrats Banner -->
-        <div id="congrats-banner" class="hidden bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/50 text-emerald-300 p-4 rounded-2xl text-center shadow-lg shadow-emerald-500/10">
-            <h2 class="text-base font-bold flex items-center justify-center gap-2">
+        <div id="congrats-banner" class="hidden bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-500/20 border border-emerald-500/40 text-emerald-300 p-4 rounded-2xl text-center shadow-xl shadow-emerald-500/10">
+            <h2 class="text-sm font-bold flex items-center justify-center gap-2">
                 <span class="text-xl">🎉</span> Congratulations! Today's tasks are fully completed!
             </h2>
         </div>
 
-        <!-- Ethiopian Date Display (Clickable to calendar.html) -->
-        <a href="calendar.html" class="stat-card p-4 space-y-1 block hover:border-amber-500/60 transition cursor-pointer">
-            <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Ethiopian Date</p>
+        <!-- Ethiopian Date Display (Just Stat Card) -->
+        <div class="stat-card p-4 space-y-1 block">
+            <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Ethiopian Date</p>
             <p id="ethiopian-date-display" class="text-sm font-bold text-slate-100 flex items-center gap-2">
                 <i class="fa-regular fa-calendar-days text-amber-400"></i> Loading...
             </p>
-        </a>
+        </div>
 
         <!-- Countdown / Reset Info Card -->
         <div class="stat-card p-4 flex justify-between items-center shadow-lg">
             <div>
-                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Reset Countdown</span>
-                <div id="countdown-timer" class="text-xl font-bold text-cyan-400 mt-0.5 font-mono">00:00:00</div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Reset Countdown</span>
+                <div id="countdown-timer" class="text-xl font-black text-cyan-400 mt-0.5 font-mono tracking-tight">00:00:00</div>
             </div>
             <div class="text-right">
-                <button id="reset-btn" class="text-[11px] bg-rose-500/10 hover:bg-rose-500/20 text-emerald-400 border border-rose-500/50 px-3.5 py-2.5 rounded-xl transition-all active:scale-95 flex items-center gap-1.5 font-semibold shadow-sm">
+                <button id="reset-btn" class="text-[11px] bg-rose-500/10 hover:bg-rose-500/20 text-emerald-400 border border-rose-500/40 px-4 py-2.5 rounded-xl transition-all active:scale-95 flex items-center gap-2 font-bold shadow-sm">
                     <i class="fa-solid fa-floppy-disk"></i>Save & Reset
                 </button>
             </div>
@@ -356,44 +408,47 @@
         <!-- Top Stats Row (2x2 Grid) -->
         <div class="grid grid-cols-2 gap-3">
             <div class="stat-card p-4">
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-1">Total Tasks</p>
-                <p id="stat-total" class="text-2xl font-extrabold text-slate-100">0</p>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Total Tasks</p>
+                <p id="stat-total" class="text-2xl font-black text-slate-100">0</p>
             </div>
             <div class="stat-card p-4">
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-1">Completed</p>
-                <p id="stat-done" class="text-2xl font-extrabold text-emerald-400">0</p>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Completed</p>
+                <p id="stat-done" class="text-2xl font-black text-emerald-400">0</p>
             </div>
             <div class="stat-card p-4">
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-1">Remaining</p>
-                <p id="stat-remaining" class="text-2xl font-extrabold text-amber-400">0</p>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Remaining</p>
+                <p id="stat-remaining" class="text-2xl font-black text-amber-400">0</p>
             </div>
             <div class="stat-card p-4">
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-1">Phones Done</p>
-                <p id="stat-phones-done" class="text-2xl font-extrabold text-cyan-400">0/0</p>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Phones Done</p>
+                <p id="stat-phones-done" class="text-2xl font-black text-cyan-400">0/0</p>
             </div>
         </div>
 
-        <!-- Overall Progress -->
-        <section class="device-card rounded-2xl p-4 shadow-xl">
-            <div class="flex items-center justify-between mb-2">
+        <!-- Overall Progress (Clickable to Accounts Tracker) -->
+        <section id="overall-progress-card" class="stat-card rounded-2xl p-4 shadow-xl cursor-pointer hover:border-emerald-500/40 transition-all active:scale-[0.99] group">
+            <div class="flex items-center justify-between mb-2.5">
                 <div>
-                    <h2 class="text-sm font-bold text-slate-100">Overall Progress</h2>
-                    <p class="text-[10px] text-slate-400">Daily task completion</p>
+                    <h2 class="text-sm font-bold text-slate-100 group-hover:text-emerald-400 transition flex items-center gap-2">
+                        Overall Progress
+                        <span class="text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Tap for Tracker</span>
+                    </h2>
+                    <p class="text-[10px] text-slate-400">Daily task completion rate</p>
                 </div>
                 <div class="text-right">
-                    <span id="progress-text" class="text-base font-extrabold text-slate-100">0%</span>
+                    <span id="progress-text" class="text-base font-black text-slate-100">0%</span>
                 </div>
             </div>
-            <div class="w-full bg-slate-800/80 h-3 rounded-full overflow-hidden p-0.5 border border-emerald-500/20">
+            <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden p-0.5 border border-white/5">
                 <div id="progress-bar" class="bg-gradient-to-r from-amber-500 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
         </section>
 
         <!-- Quick Phone Filter Buttons Bar -->
         <section>
-            <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-2">Phones</p>
+            <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-2">Phones</p>
             <div class="grid grid-cols-4 gap-2 items-center">
-                <button class="phone-filter-btn active py-4" data-phone="all">All <span id="phone-badge-all" class="phone-badge">0</span></button>
+                <button class="phone-filter-btn active py-3.5" data-phone="all">All <span id="phone-badge-all" class="phone-badge">0</span></button>
                 <div class="col-span-3 grid grid-cols-3 gap-2">
                     <div id="phone-filters-row1-col" class="contents"></div>
                     <div id="phone-filters-row2-col" class="contents"></div>
@@ -403,9 +458,9 @@
 
         <!-- Dynamic Devices Container -->
         <div id="devices-container" class="space-y-4">
-            <div id="loading-spinner" class="text-center py-10 text-slate-500">
-                <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
-                <p class="text-sm">Loading devices and accounts...</p>
+            <div id="loading-spinner" class="text-center py-12 text-slate-500">
+                <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-emerald-400"></i>
+                <p class="text-xs font-semibold">Loading devices and accounts...</p>
             </div>
         </div>
 
@@ -724,14 +779,14 @@
                 const isUrgent = acc.remainingDays <= 10;
                 const ruleConfig = getAppRule(acc.appType, acc.dailyReward);
                 
-                html += '<div class="account-item-card border ' + (isUrgent ? 'border-emerald-500/80 shadow-lg shadow-emerald-500/10' : 'border-emerald-500/30') + ' rounded-2xl p-3 flex items-center justify-between gap-3">' +
+                html += '<div class="account-item-card border ' + (isUrgent ? 'border-emerald-500/80 shadow-lg shadow-emerald-500/10' : 'border-white/5') + ' rounded-2xl p-3 flex items-center justify-between gap-3">' +
                     '<div class="flex items-center gap-3 min-w-0">' +
-                        '<div class="w-10 h-10 rounded-xl bg-gradient-to-br ' + acc.color + ' flex items-center justify-center text-white flex-shrink-0 shadow">' +
+                        '<div class="w-10 h-10 rounded-xl bg-gradient-to-br ' + acc.color + ' flex items-center justify-center text-white flex-shrink-0 shadow-md">' +
                             '<i class="fa-solid fa-video text-xs"></i>' +
                         '</div>' +
                         '<div class="min-w-0">' +
                             '<div class="flex items-center gap-1.5">' +
-                                '<h4 class="text-xs font-bold text-yellow-600/90 truncate">' + acc.name + '</h4>' +
+                                '<h4 class="text-xs font-bold text-yellow-500/90 truncate">' + acc.name + '</h4>' +
                                 '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase ' + ruleConfig.badgeColor + '">' + acc.appType + '</span>' +
                             '</div>' +
                             '<p class="text-[10px] text-slate-400 mt-0.5">Device: <span class="text-slate-300 font-semibold">' + acc.devName + '</span> | Days Done: <span class="text-amber-400 font-bold">' + acc.daysWorked + 'd</span></p>' +
@@ -787,7 +842,6 @@
                 dateElem.innerHTML = '<i class="fa-regular fa-calendar-days text-amber-400"></i> ' + toEthiopianDate(now);
             }
             
-            // የኢትዮጵያ ሰአት አቆጣጠር ከምሽቱ 1:00 (13:00) ማለት ከቀኑ 7:00 ሰአት (19:00 PM) ጋር እኩል ነው።
             let targetTime = new Date();
             targetTime.setHours(19, 0, 0, 0);
             
@@ -797,7 +851,6 @@
             
             let diff = targetTime - now;
             
-            // ሰአቱ ከምሽቱ 1:00 (19:00) ሲደርስ (ማለትም diff ወደ 0 ሲጠጋ ወይም ካለፈ) እና ዛሬ አሁንም አውቶማቲክ ሪሴት ካልተደረገ በራስ ሰር ሴቭ እና ሪሴት ይደረጋል
             let currentDateStr = now.toDateString();
             if (now.getHours() === 19 && now.getMinutes() === 0 && now.getSeconds() === 0 && lastAutoResetDate !== currentDateStr) {
                 lastAutoResetDate = currentDateStr;
@@ -905,8 +958,8 @@
         function createTrackerBadgeHtml(accId, appType, customDailyReward) {
             const stats = getAccountStats(accId, appType, customDailyReward);
             const rule = getAppRule(appType, customDailyReward);
-            return '<div id="' + accId + '_stats" class="hidden my-2 p-2.5 bg-slate-900/95 rounded-xl border border-emerald-500/30 text-[10px] space-y-1.5 shadow-inner">' +
-                '<div class="flex justify-between items-center text-slate-200 font-medium">' +
+            return '<div id="' + accId + '_stats" class="hidden my-2.5 p-3 bg-slate-950/80 rounded-xl border border-white/5 text-[10px] space-y-2 shadow-inner">' +
+                '<div class="flex justify-between items-center text-slate-200 font-semibold">' +
                     '<span><i class="fa-regular fa-calendar-check text-amber-400 mr-1"></i>Days: <strong class="text-amber-400 font-bold">' + stats.daysWorked + ' d</strong></span>' +
                     '<span><i class="fa-solid fa-coins text-yellow-400 blink-icon mr-1"></i>Points: <strong class="text-amber-400 font-extrabold">' + stats.earnedFormatted + '</strong> / <span class="text-slate-300 font-bold">' + rule.targetFormatted + '</span></span>' +
                 '</div>' +
@@ -931,9 +984,10 @@
 
             if (devicesData.length === 0) {
                 container.innerHTML = `
-                    <div class="bg-slate-900 border border-emerald-500/30 rounded-2xl p-8 text-center">
-                        <p class="text-slate-400 text-sm mb-3">No devices or accounts found yet.</p>
-                        <a href="setup.html" class="inline-block bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-4 py-2 rounded-lg text-xs transition">
+                    <div class="bg-slate-900/60 border border-white/10 rounded-3xl p-8 text-center shadow-xl backdrop-blur-md">
+                        <i class="fa-solid fa-mobile-screen text-3xl text-slate-600 mb-3"></i>
+                        <p class="text-slate-400 text-xs font-semibold mb-4">No devices or accounts found yet.</p>
+                        <a href="setup.html" class="inline-block bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-lg shadow-amber-500/20 active:scale-95">
                             + Add Your First Device & App
                         </a>
                     </div>
@@ -950,23 +1004,23 @@
             filteredDevices.forEach((dev, idx) => {
                 const totalTasks = countDeviceTasks(dev);
                 
-                fullHtml += '<div class="device-card rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 mb-4">' +
+                fullHtml += '<div class="device-card rounded-3xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 mb-4">' +
                     '<div class="flex items-center justify-between mb-3">' +
                         '<div class="flex items-center gap-3 min-w-0 pr-2">' +
-                            '<div class="w-9 h-9 rounded-xl bg-gradient-to-br ' + (dev.color || 'from-blue-500 to-cyan-500') + ' flex items-center justify-center shadow-lg flex-shrink-0">' +
+                            '<div class="w-10 h-10 rounded-2xl bg-gradient-to-br ' + (dev.color || 'from-blue-500 to-cyan-500') + ' flex items-center justify-center shadow-lg flex-shrink-0">' +
                                 '<i class="fa-solid fa-mobile-button text-white text-sm"></i>' +
                             '</div>' +
                             '<div class="min-w-0">' +
                                 '<h3 class="phone-title truncate">' + dev.name + '</h3>' +
-                                '<p class="text-[10px] text-slate-400">' + totalTasks + ' tasks</p>' +
+                                '<p class="text-[10px] text-slate-400 font-semibold">' + totalTasks + ' tasks active</p>' +
                             '</div>' +
                         '</div>' +
-                        '<div class="flex items-center gap-1.5 flex-shrink-0">' +
-                            '<span id="badge-' + dev.id + '" class="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-700 text-slate-300 transition-all whitespace-nowrap">Pending</span>' +
-                            '<span id="pct-' + dev.id + '" class="text-base font-extrabold text-amber-400 whitespace-nowrap">0%</span>' +
+                        '<div class="flex items-center gap-2 flex-shrink-0">' +
+                            '<span id="badge-' + dev.id + '" class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 transition-all whitespace-nowrap border border-white/5">Pending</span>' +
+                            '<span id="pct-' + dev.id + '" class="text-sm font-black text-amber-400 whitespace-nowrap">0%</span>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="w-full device-progress-bg h-2 rounded-full overflow-hidden mb-4 border border-emerald-500/20">' +
+                    '<div class="w-full device-progress-bg h-2 rounded-full overflow-hidden mb-4 border border-white/5">' +
                         '<div id="bar-' + dev.id + '" class="device-progress-fill h-full rounded-full" style="width: 0%"></div>' +
                     '</div>' +
                     '<div class="space-y-3">';
@@ -974,34 +1028,34 @@
                 // 1. Poppo Live
                 const poppoList = dev.poppo || [];
                 if (poppoList.length > 0) {
-                    fullHtml += '<div class="flex items-center gap-2 mb-1">' +
+                    fullHtml += '<div class="flex items-center gap-2 mb-1.5 px-1">' +
                         '<i class="fa-solid fa-video text-rose-400 text-[10px]"></i>' +
                         '<p class="app-header text-rose-400">Poppo Live <span class="text-slate-500">(' + poppoList.length + ')</span></p>' +
                     '</div>';
                     poppoList.forEach(p => {
-                        fullHtml += '<div class="account-item-card rounded-xl overflow-hidden mb-2 p-1">' +
-                            '<div class="task-row flex items-center justify-between p-2.5 rounded-lg">' +
-                                '<div class="flex items-center gap-2.5 min-w-0">' +
-                                    '<input type="checkbox" id="' + p.id + '_master" data-type="master" data-prefix="' + p.id + '" data-app="poppo" data-daily="' + (p.dailyReward || '') + '" class="checkbox-custom w-5 h-5 rounded cursor-pointer flex-shrink-0">' +
-                                    '<label for="' + p.id + '_master" class="task-label text-yellow-600/90 font-bold cursor-pointer select-none truncate">' + p.name + '</label>' +
+                        fullHtml += '<div class="account-item-card rounded-2xl overflow-hidden mb-2 p-1">' +
+                            '<div class="task-row flex items-center justify-between p-2.5 rounded-xl">' +
+                                '<div class="flex items-center gap-3 min-w-0">' +
+                                    '<input type="checkbox" id="' + p.id + '_master" data-type="master" data-prefix="' + p.id + '" data-app="poppo" data-daily="' + (p.dailyReward || '') + '" class="checkbox-custom cursor-pointer flex-shrink-0">' +
+                                    '<label for="' + p.id + '_master" class="task-label text-yellow-500/90 font-bold cursor-pointer select-none truncate">' + p.name + '</label>' +
                                 '</div>' +
                                 '<div class="flex items-center gap-1.5 flex-shrink-0 ml-2">' +
                                     '<button class="toggle-btn btn-view-tracker" data-target="' + p.id + '_stats" title="Toggle Tracker">' +
                                         '<i class="fa-solid fa-chart-line"></i>' +
                                     '</button>' +
-                                    '<button class="toggle-btn text-slate-400 hover:text-white p-1 transition" data-target="' + p.id + '_details">' +
+                                    '<button class="toggle-btn text-slate-400 hover:text-white p-1.5 transition" data-target="' + p.id + '_details">' +
                                         '<i class="fa-solid fa-chevron-down text-xs"></i>' +
                                     '</button>' +
                                 '</div>' +
                             '</div>' +
                             '<div class="px-2.5">' + createTrackerBadgeHtml(p.id, 'poppo', p.dailyReward) + '</div>' +
-                            '<div id="' + p.id + '_details" class="hidden p-2.5 border-t border-emerald-500/20 space-y-2 bg-slate-900/30 rounded-b-xl">' +
-                                '<div class="flex items-center gap-2.5 pl-1">' +
-                                    '<input type="checkbox" id="' + p.id + '_live" data-type="sub" data-prefix="' + p.id + '" class="checkbox-custom sub rounded cursor-pointer flex-shrink-0">' +
+                            '<div id="' + p.id + '_details" class="hidden p-3 border-t border-white/5 space-y-2 bg-slate-950/40 rounded-b-2xl">' +
+                                '<div class="flex items-center gap-3 pl-1">' +
+                                    '<input type="checkbox" id="' + p.id + '_live" data-type="sub" data-prefix="' + p.id + '" class="checkbox-custom sub cursor-pointer flex-shrink-0">' +
                                     '<label for="' + p.id + '_live" class="sub-task-label text-slate-300 cursor-pointer select-none">Live</label>' +
                                 '</div>' +
-                                '<div class="flex items-center gap-2.5 pl-1">' +
-                                    '<input type="checkbox" id="' + p.id + '_party" data-type="sub" data-prefix="' + p.id + '" class="checkbox-custom sub rounded cursor-pointer flex-shrink-0">' +
+                                '<div class="flex items-center gap-3 pl-1">' +
+                                    '<input type="checkbox" id="' + p.id + '_party" data-type="sub" data-prefix="' + p.id + '" class="checkbox-custom sub cursor-pointer flex-shrink-0">' +
                                     '<label for="' + p.id + '_party" class="sub-task-label text-slate-300 cursor-pointer select-none">Party</label>' +
                                 '</div>' +
                             '</div>' +
@@ -1016,16 +1070,16 @@
                         if (list.length > 0) {
                             let sampleDaily = list[0].dailyReward;
                             let rule = getAppRule(key, sampleDaily);
-                            fullHtml += '<div class="flex items-center gap-2 mt-2 mb-1">' +
+                            fullHtml += '<div class="flex items-center gap-2 mt-3 mb-1.5 px-1">' +
                                 '<i class="fa-solid fa-tower-broadcast text-blue-400 text-[10px]"></i>' +
                                 '<p class="app-header text-blue-400">' + rule.name + ' <span class="text-slate-500">(' + list.length + ')</span></p>' +
                             '</div>';
                             list.forEach(t => {
-                                fullHtml += '<div class="account-item-card rounded-xl p-2.5 mb-2">' +
+                                fullHtml += '<div class="account-item-card rounded-2xl p-2.5 mb-2">' +
                                     '<div class="task-row flex items-center justify-between">' +
-                                        '<div class="flex items-center gap-2.5 min-w-0">' +
-                                            '<input type="checkbox" id="' + t.id + '" data-type="standalone" data-acc="' + t.id + '" data-app="' + key + '" data-daily="' + (t.dailyReward || '') + '" class="checkbox-custom w-5 h-5 rounded cursor-pointer flex-shrink-0">' +
-                                            '<label for="' + t.id + '" class="task-label text-yellow-600/90 font-bold cursor-pointer select-none truncate">' + t.name + '</label>' +
+                                        '<div class="flex items-center gap-3 min-w-0">' +
+                                            '<input type="checkbox" id="' + t.id + '" data-type="standalone" data-acc="' + t.id + '" data-app="' + key + '" data-daily="' + (t.dailyReward || '') + '" class="checkbox-custom cursor-pointer flex-shrink-0">' +
+                                            '<label for="' + t.id + '" class="task-label text-yellow-500/90 font-bold cursor-pointer select-none truncate">' + t.name + '</label>' +
                                         '</div>' +
                                         '<button class="toggle-btn btn-view-tracker flex-shrink-0 ml-2" data-target="' + t.id + '_stats" title="Toggle Tracker">' +
                                             '<i class="fa-solid fa-chart-line"></i>' +
@@ -1102,6 +1156,7 @@
             const closeAccountsModal = document.getElementById('close-accounts-modal');
             const menuAccountsBtn = document.getElementById('menu-accounts-btn');
             const menuLogoutBtn = document.getElementById('menu-logout-btn');
+            const overallProgressCard = document.getElementById('overall-progress-card');
 
             menuToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -1115,6 +1170,15 @@
             dropdownMenu.addEventListener('click', (e) => {
                 e.stopPropagation();
             });
+
+            // Overall Progress ሲነካ Accounts Tracker ሞዳል ይከፈታል
+            if (overallProgressCard) {
+                overallProgressCard.addEventListener('click', () => {
+                    updateTrackerFilters();
+                    updatePoppoAccountsModalList();
+                    accountsModal.classList.remove('hidden');
+                });
+            }
 
             menuAccountsBtn.addEventListener('click', () => {
                 dropdownMenu.classList.add('hidden');
@@ -1208,13 +1272,13 @@
                 if (badge) {
                     if (devPct === 100) {
                         badge.innerText = '✓ Completed';
-                        badge.className = 'completed-badge text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all whitespace-nowrap';
+                        badge.className = 'completed-badge text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all whitespace-nowrap';
                     } else if (devPct > 0) {
                         badge.innerText = 'In Progress';
-                        badge.className = 'text-[10px] font-bold px-2 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all whitespace-nowrap';
+                        badge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all whitespace-nowrap';
                     } else {
                         badge.innerText = 'Pending';
-                        badge.className = 'text-[10px] font-bold px-2 py-1 rounded-full bg-slate-700 text-slate-400 border border-slate-600 transition-all whitespace-nowrap';
+                        badge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-white/5 transition-all whitespace-nowrap';
                     }
                 }
             });
