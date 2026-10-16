@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0b0f19">
     <script>(function(){try{var t=localStorage.getItem('theme');if(!t)t='dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
     <title>Multi-Device Task & Account Controller</title>
@@ -324,6 +324,40 @@
         .dev-sub { display: block; font-size: .65rem; font-weight: 600; color: var(--ink-3); margin-top: 1px; }
         .dev-bar { margin: 0 .95rem .7rem; }
         .dev-row.open .dev-inner { padding: .1rem .75rem .9rem; }
+
+        /* ===== Stable layout + all phone sizes ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        html body main { padding-top: max(1.25rem, env(safe-area-inset-top)); padding-bottom: max(6rem, calc(2rem + env(safe-area-inset-bottom))); }
+        .menu-fab { top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); }
+
+        /* two equal fixed columns, so a changing clock can never resize or push the progress card */
+        .top-cards { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+        .time-card, .prog-card { height: 6.9rem; min-height: 0; overflow: hidden; }
+        .time-card { padding: .95rem clamp(.7rem, 3.4vw, 1.1rem); }
+        .date-row { min-width: 0; font-size: clamp(.68rem, 3.3vw, .85rem); }
+        .date-row i { flex-shrink: 0; }
+        .date-row span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* the global * font rule also hit the seconds span (proportional digits) - force one fixed-width font for the whole clock */
+        .clock, .clock * { font-family: ui-monospace, 'SF Mono', 'DejaVu Sans Mono', Menlo, Consolas, 'Roboto Mono', monospace; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; }
+        .clock { font-size: clamp(1.35rem, 7.4vw, 2rem); letter-spacing: 0; overflow: hidden; }
+        .clock .sec { font-size: .52em; margin-left: .12em; }
+
+        .prog-card { padding: .8rem clamp(.5rem, 2.6vw, .8rem); justify-content: space-evenly; gap: .3rem; }
+        .ring-box { width: clamp(3.3rem, 14.5vw, 4.6rem); height: clamp(3.3rem, 14.5vw, 4.6rem); }
+        .ring-box span { font-size: clamp(.72rem, 3.4vw, .95rem); }
+        .frac { min-width: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .fd { font-size: clamp(1.3rem, 6.2vw, 1.9rem); }
+        .ft { font-size: clamp(1rem, 4.6vw, 1.4rem); }
+
+        .phone-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .pcircle { width: clamp(2.7rem, 12vw, 3.1rem); height: clamp(2.7rem, 12vw, 3.1rem); }
+
+        .dev-inner [id$="_stats"] > div { flex-wrap: wrap; gap: .3rem .6rem; }
+        @media (max-width: 340px) {
+            .dev-head { gap: .6rem; }
+            .dev-head [id^="badge-"] { display: none; }
+        }
 
         @media (prefers-reduced-motion: reduce) { html body * { animation: none !important; transition: none !important; } }
     </style>
