@@ -413,6 +413,9 @@
         @media (max-width: 380px) { .pill-label { display: none; } .head-actions { gap: .1rem; } html body #menu-toggle-btn.menu-pill { padding: .5rem .7rem !important; } .notif-panel { right: -2rem; } }
         @media (prefers-reduced-motion: reduce) { .shine-text::after { display: none; } .bell-dot { animation: none; } }
 
+        /* ===== Offline ===== */
+        .offline-bar { text-align: center; font-size: .72rem; font-weight: 700; line-height: 1.35; padding: .45rem 1rem; background: rgba(251,191,36,.14); color: var(--amber); border-bottom: 1px solid rgba(251,191,36,.3); }
+
         @media (prefers-reduced-motion: reduce) { html body * { animation: none !important; transition: none !important; } }
     </style>
 </head>
@@ -463,7 +466,7 @@
                         <a href="setup.html" class="w-full text-left px-4 py-3 text-xs font-semibold text-slate-200 hover:bg-white/5 flex items-center justify-between transition border-t border-white/5">
                             <span class="flex items-center gap-2.5"><i class="fa-solid fa-gear text-amber-400"></i> Setup</span>
                         </a>
-                        <button id="menu-logout-btn" class="w-full text-left px-4 py-3 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 flex items-center justify-between transition border-t border-white/5">
+                        <button id="menu-signout-btn" class="w-full text-left px-4 py-3 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 flex items-center justify-between transition border-t border-white/5">
                             <span class="flex items-center gap-2.5"><i class="fa-solid fa-right-from-bracket"></i> Sign out</span>
                         </button>
                     </div>
@@ -471,6 +474,7 @@
             </div>
         </div>
     </header>
+    <div id="offline-bar" class="offline-bar hidden">You are offline - changes are saved on this phone and sync when you are back online</div>
 
     <!-- Accounts Modal / Drawer -->
     <div id="accounts-modal" class="fixed inset-0 z-[90] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
@@ -775,7 +779,7 @@ function getAppLogoClass(key) {
                     if (confirmed) {
                         daysCache[accId] = newPoints;
                         localStorage.setItem(accId + '_earned_points', newPoints);
-                        if (daysRef) daysRef.child(accId).set(newPoints);
+                        pushDay(accId, newPoints);
                         editingStates[accId] = false;
                         refreshSingleTrackerUI(accId, appType, customDailyReward);
                     }
@@ -789,7 +793,7 @@ function getAppLogoClass(key) {
                     editingStates[accId] = false;
                     daysCache[accId] = 0;
                     localStorage.setItem(accId + '_earned_points', 0);
-                    if (daysRef) daysRef.child(accId).set(0);
+                    pushDay(accId, 0);
                     refreshSingleTrackerUI(accId, appType, customDailyReward);
                 }
             });
@@ -999,7 +1003,7 @@ function getAppLogoClass(key) {
                 localStorage.removeItem(cb.id);
                 updates[cb.id] = false;
             });
-            if (tasksRef) tasksRef.update(updates);
+            pushTasks(updates);
             updateProgressLocal();
         }
 
@@ -1071,7 +1075,7 @@ function getAppLogoClass(key) {
             
             daysCache[accId] = earnedPoints;
             localStorage.setItem(accId + '_earned_points', earnedPoints);
-            if (daysRef) daysRef.child(accId).set(earnedPoints);
+            pushDay(accId, earnedPoints);
             refreshSingleTrackerUI(accId, appType, customDailyReward);
         }
 
@@ -1296,23 +1300,14 @@ function rebindDynamicElements() {
                 accountsModal.classList.add('hidden');
             });
 
-            if (menuLogoutBtn) {
-                menuLogoutBtn.addEventListener('click', () => {
+            const menuSignoutBtn = document.getElementById('menu-signout-btn');
+            if (menuSignoutBtn) {
+                menuSignoutBtn.addEventListener('click', () => {
                     dropdownMenu.classList.add('hidden');
-                    showCustomConfirm('Sign out', 'Are you sure you want to sign out?', (confirmed) => {
-                        if (confirmed) {
-                            auth.signOut().then(() => {
-                                clearKeepTheme();
-                                window.location.href = "index.html";
-                            }).catch(() => {
-                                clearKeepTheme();
-                                window.location.href = "index.html";
-                            });
-                        }
-                    });
+                    signOutThisPhone();
                 });
             }
-            
+
             // Reset is handled by the phone grid button
         }
 
@@ -1365,8 +1360,74 @@ function rebindDynamicElements() {
                 updates[cb.id] = cb.checked;
                 localStorage.setItem(cb.id, cb.checked);
             });
-            if (tasksRef) tasksRef.update(updates);
+            pushTasks(updates);
             updateProgressLocal();
+        }
+
+        let pendingWrites = 0;
+
+        function markDirty() { try { localStorage.setItem('vita_dirty', '1'); } catch (e) {} }
+
+        function trackWrite(promise) {
+            if (!promise || !promise.then) return;
+            pendingWrites++;
+            markDirty();
+            const done = () => {
+                pendingWrites = Math.max(0, pendingWrites - 1);
+                if (pendingWrites === 0) { try { localStorage.removeItem('vita_dirty'); } catch (e) {} }
+            };
+            promise.then(done, done);
+        }
+
+        function pushTasks(updates) {
+            if (tasksRef) trackWrite(tasksRef.update(updates)); else markDirty();
+        }
+
+        function pushDay(accId, value) {
+            if (daysRef) trackWrite(daysRef.child(accId).set(value)); else markDirty();
+        }
+
+        // after being offline: send what this phone saved instead of overwriting it with older cloud data
+        function pushLocalToRemote() {
+            const t = {};
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => { t[cb.id] = cb.checked; });
+            const d = {};
+            devicesData.forEach(dev => {
+                Object.keys(dev).forEach(key => {
+                    if (key !== 'id' && key !== 'name' && key !== 'color' && Array.isArray(dev[key])) {
+                        dev[key].forEach(acc => {
+                            const v = parseFloat(localStorage.getItem(acc.id + '_earned_points'));
+                            if (!isNaN(v)) d[acc.id] = v;
+                        });
+                    }
+                });
+            });
+            if (tasksRef && Object.keys(t).length) trackWrite(tasksRef.update(t));
+            if (daysRef && Object.keys(d).length) trackWrite(daysRef.update(d));
+        }
+
+        function signOutThisPhone() {
+            const dirty = localStorage.getItem('vita_dirty') === '1';
+            const msg = (dirty ? 'Some changes are not synced to the cloud yet and will be lost. ' : '') +
+                'Sign out of this phone? The data on this phone is removed. Your cloud data stays safe and comes back when you sign in again.';
+            showCustomConfirm('Sign out', msg, (ok) => {
+                if (!ok) return;
+                const finish = () => {
+                    clearKeepTheme();
+                    window.location.replace('index.html');
+                };
+                try { if (auth) { auth.signOut().then(finish, finish); return; } } catch (e) {}
+                finish();
+            });
+        }
+
+        function initOffline() {
+            const bar = document.getElementById('offline-bar');
+            const refresh = () => { if (bar) bar.classList.toggle('hidden', navigator.onLine); };
+            window.addEventListener('online', refresh);
+            window.addEventListener('offline', refresh);
+            refresh();
+            if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
         function updateBellDot(left) {
@@ -1660,6 +1721,14 @@ let activeUid = null;
             const yRef = db.ref('users/' + userId + '/days');
             devicesRef = dRef; tasksRef = tRef; daysRef = yRef;
             const noop = () => {};
+            let resync = (localStorage.getItem('vita_dirty') === '1') ? { tasks: true, days: true, pushed: false } : null;
+            const resyncFirst = (kind) => {
+                if (!resync || !resync[kind]) return false;
+                resync[kind] = false;
+                if (!resync.pushed) { resync.pushed = true; pushLocalToRemote(); }
+                if (!resync.tasks && !resync.days) resync = null;
+                return true;
+            };
 
             const onDevices = dRef.on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1673,6 +1742,7 @@ let activeUid = null;
             }, noop);
 
             const onTasks = tRef.on('value', (snapshot) => {
+                if (resyncFirst('tasks')) return;
                 const data = snapshot.val();
                 if (data) {
                     Object.keys(data).forEach(id => {
@@ -1685,6 +1755,7 @@ let activeUid = null;
             }, noop);
 
             const onDays = yRef.on('value', (snapshot) => {
+                if (resyncFirst('days')) return;
                 const data = snapshot.val();
                 if (data) {
                     daysCache = data;
@@ -1720,10 +1791,14 @@ let activeUid = null;
             if (cachedUid) attachListeners(cachedUid);
             auth.onAuthStateChanged((user) => {
                 if (!user) {
-                    localStorage.removeItem('last_uid');
-                    window.location.href = "index.html";
+                    // no saved session: ask for login (offline we keep working with the saved data)
+                    if (navigator.onLine) {
+                        localStorage.removeItem('userId');
+                        window.location.replace('index.html?login=1');
+                    }
                     return;
                 }
+                localStorage.setItem('userId', user.uid);
                 localStorage.setItem('last_uid', user.uid);
                 attachListeners(user.uid);
             });
@@ -1738,6 +1813,7 @@ let activeUid = null;
             updateClockAndCountdown();
             setInterval(updateClockAndCountdown, 1000);
             requestAnimationFrame(() => requestAnimationFrame(syncShine));
+            initOffline();
             try { initFirebaseListeners(); } catch (e) { console.log("Firebase init error", e); }
         });
     </script>
