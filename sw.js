@@ -1,56 +1,46 @@
-const CACHE_NAME = 'task-controller-v1';
-const ASSETS_TO_CACHE = [
-  './index.html',
-  './setup.html',
-  './manifest.json'
-];
+/* VITA offline cache - keeps the app shell and CDN libraries on the phone.
+   Bump CACHE_VERSION whenever you upload new versions of the pages. */
+const CACHE_VERSION = 'vita-v1';
+const SHELL = ['./', 'index.html', 'dashboard.html', 'setup.html', 'manifest.json'];
+const CDN_HOSTS = ['cdn.tailwindcss.com', 'cdnjs.cloudflare.com', 'www.gstatic.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 
-// 1. Install Event - ፋይሎችን በ Cache ውስጥ ማስቀመጥ
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_VERSION)
+      .then((cache) => Promise.all(SHELL.map((url) => cache.add(url).catch(() => {}))))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-// 2. Activate Event - የቆዩ Cache ፋይሎችን ማጽዳት
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    })
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE_VERSION).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// 3. Fetch Event - ኢንተርኔት በሌለ ጊዜ ከ Cache ማሳየት
+// Stale-while-revalidate: answer from the phone instantly, refresh the copy in the background.
 self.addEventListener('fetch', (event) => {
-  // ከ Firebase ዳታቤዝ የሚመጡ ጥያቄዎችን አያያዝ (ለጊዜው በቀጥታ ወደ አውታረ መረብ እንዲሄድ መተው)
-  if (event.request.url.includes('firebaseio.com') || event.request.url.includes('googleapis.com')) {
-    return;
-  }
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin && !CDN_HOSTS.includes(url.hostname)) return; // Firebase database traffic is never cached
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((response) => {
-        return response;
-      }).catch(() => {
-        // ኢንተርኔት ከሌለ እና ፋይሉ ካልተገኘ የሚሰጥ አማራጭ
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
-    })
-  );
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_VERSION);
+    const cached = await cache.match(req);
+    const refresh = fetch(req).then((res) => {
+      if (res && (res.ok || res.type === 'opaque')) cache.put(req, res.clone());
+      return res;
+    }).catch(() => null);
+    if (cached) { event.waitUntil(refresh); return cached; }
+    const fresh = await refresh;
+    if (fresh) return fresh;
+    if (req.mode === 'navigate') {
+      const home = await cache.match('index.html');
+      if (home) return home;
+    }
+    return new Response('Offline', { status: 503, statusText: 'Offline' });
+  })());
 });
